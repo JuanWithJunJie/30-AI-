@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI术语科普营 · Day 1 · Token · 手机制造厂版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --red:    #E8003D;
+    --orange: #FF6B35;
+    --yellow: #FFD166;
+    --teal:   #00B4A6;
+    --dark:   #0D1B2A;
+    --ink:    #1C2B3A;
+    --muted:  #6B7A8D;
+    --cream:  #F4F9FF;
+    --white:  #FFFFFF;
+    --card-w: 390px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #E8EDF2;
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px 20px;
+  }
+
+  .card {
+    width: var(--card-w);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 6px 32px rgba(0,0,0,.13);
+    position: relative;
+  }
+
+  /* ====== CARD 1 · COVER ====== */
+  .card-cover {
+    background: var(--dark);
+    min-height: 540px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 40px 34px;
+  }
+  .card-cover::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 90% 5%,  #E8003D44 0%, transparent 50%),
+      radial-gradient(ellipse at 10% 85%, #00B4A622 0%, transparent 50%);
+    pointer-events: none;
+  }
+  /* circuit board texture */
+  .card-cover::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,180,166,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,180,166,.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  .cover-series {
+    position: absolute; top: 28px; left: 34px;
+    display: flex; gap: 8px; align-items: center;
+    z-index: 2;
+  }
+  .cover-pill {
+    background: var(--red);
+    color: #fff; font-size: 11px; font-weight: 700;
+    padding: 5px 12px; border-radius: 20px;
+    letter-spacing: 1px;
+  }
+  .cover-pill-outline {
+    border: 1px solid rgba(255,255,255,.25);
+    color: rgba(255,255,255,.6); font-size: 11px;
+    padding: 5px 12px; border-radius: 20px;
+    letter-spacing: 1px;
+  }
+  .cover-phone-icon {
+    position: absolute; top: 60px; right: 30px;
+    font-size: 100px; opacity: .06; z-index: 1;
+    transform: rotate(15deg);
+  }
+  .cover-day {
+    font-size: 11px; color: rgba(255,255,255,.4);
+    letter-spacing: 4px; margin-bottom: 10px;
+    position: relative; z-index: 2;
+  }
+  .cover-word {
+    font-size: 80px; font-weight: 900;
+    color: var(--white); line-height: .95;
+    letter-spacing: -3px;
+    position: relative; z-index: 2;
+  }
+  .cover-word em {
+    font-style: normal;
+    color: var(--yellow);
+    text-shadow: 0 0 40px rgba(255,209,102,.4);
+  }
+  .cover-tagline {
+    font-size: 14px; color: rgba(255,255,255,.65);
+    margin-top: 18px; line-height: 1.7;
+    border-left: 3px solid var(--teal);
+    padding-left: 14px;
+    position: relative; z-index: 2;
+  }
+  .cover-audience {
+    position: absolute; bottom: 52px; right: 34px;
+    display: flex; flex-direction: column; gap: 5px;
+    z-index: 2; align-items: flex-end;
+  }
+  .audience-tag {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.6); font-size: 10px;
+    padding: 3px 10px; border-radius: 10px;
+  }
+  .cover-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--red), var(--orange), var(--yellow), var(--teal));
+  }
+
+  /* ====== CARD 2 · STORY 管理层 ====== */
+  .card-mgmt {
+    background: var(--white);
+    padding: 36px 30px;
+    min-height: 580px;
+  }
+  .role-banner {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin-bottom: 22px;
+  }
+  .role-banner.mgmt { background: #FFF0F3; border: 1.5px solid #FFCCD5; }
+  .role-banner.eng  { background: #F0FAFF; border: 1.5px solid #B3E5FC; }
+  .role-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .role-dot.mgmt { background: var(--red); }
+  .role-dot.eng  { background: var(--teal); }
+  .role-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .role-label.mgmt { color: var(--red); }
+  .role-label.eng  { color: var(--teal); }
+  .role-sub { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  .scene-location {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .body-p {
+    font-size: 14px; color: var(--ink);
+    line-height: 1.95; margin-bottom: 14px;
+  }
+  .quote-wrap {
+    background: #FFFBF0;
+    border-left: 4px solid var(--orange);
+    border-radius: 0 14px 14px 0;
+    padding: 16px 18px;
+    margin: 18px 0;
+    position: relative;
+  }
+  .quote-wrap::before {
+    content: '"'; position: absolute;
+    top: -6px; left: 14px;
+    font-size: 44px; color: var(--orange); opacity: .25; line-height: 1;
+  }
+  .quote-wrap p { font-size: 13.5px; color: var(--ink); line-height: 1.85; font-style: italic; }
+  .quote-wrap .speaker {
+    font-size: 11px; color: var(--muted); margin-top: 8px;
+    font-style: normal; font-weight: 600;
+  }
+  .hl { font-weight: 700; color: var(--red); }
+  .hl-teal { font-weight: 700; color: var(--teal); }
+
+  /* ====== CARD 3 · STORY 工程师 ====== */
+  .card-eng {
+    background: #0D1B2A;
+    padding: 36px 30px;
+    min-height: 540px;
+  }
+  .card-eng::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,180,166,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,180,166,.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .card-eng .body-p { color: rgba(255,255,255,.75); }
+  .card-eng .quote-wrap {
+    background: rgba(255,255,255,.06);
+    border-left-color: var(--teal);
+    border-radius: 0 14px 14px 0;
+  }
+  .card-eng .quote-wrap::before { color: var(--teal); }
+  .card-eng .quote-wrap p { color: rgba(255,255,255,.85); }
+  .card-eng .quote-wrap .speaker { color: rgba(255,255,255,.4); }
+  .card-eng .scene-location { color: rgba(255,255,255,.35); }
+
+  /* ====== CARD 4 · EXPLAIN ====== */
+  .card-explain {
+    background: var(--cream);
+    padding: 36px 30px;
+    min-height: 600px;
+  }
+  .section-head {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700;
+    padding: 7px 16px; border-radius: 10px;
+    margin-bottom: 22px;
+  }
+  .section-head.red    { background: var(--red); color: #fff; }
+  .section-head.teal   { background: var(--teal); color: #fff; }
+  .section-head.orange { background: var(--orange); color: #fff; }
+  .section-head.dark   { background: var(--dark); color: #fff; }
+  .section-head.yellow { background: var(--yellow); color: var(--dark); }
+
+  .analogy-table { width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 14px; overflow: hidden; }
+  .analogy-table th {
+    padding: 12px 14px; font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; text-align: left;
+  }
+  .analogy-table th.left  { background: var(--orange); color: #fff; width: 50%; }
+  .analogy-table th.right { background: var(--dark);   color: #fff; width: 50%; }
+  .analogy-table td { padding: 10px 14px; font-size: 13px; color: var(--ink); vertical-align: top; }
+  .analogy-table tr:nth-child(even) td { background: rgba(0,0,0,.03); }
+  .analogy-table tr:nth-child(odd)  td { background: var(--white); }
+  .analogy-table td.special { font-weight: 700; color: var(--red); }
+
+  .stat-row { display: flex; gap: 10px; margin: 16px 0; flex-wrap: wrap; }
+  .stat-chip {
+    background: var(--white);
+    border: 1.5px solid #E0E8F0;
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 13px; font-weight: 700; color: var(--ink);
+  }
+  .stat-chip span { color: var(--red); }
+
+  .info-box {
+    background: var(--white);
+    border: 1.5px solid #E0E8F0;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 14px 0;
+  }
+  .info-box p { font-size: 13px; color: var(--ink); line-height: 1.85; }
+  .info-box .note { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  /* ====== CARD 5 · SCENES ====== */
+  .card-scenes {
+    background: var(--white);
+    padding: 36px 30px;
+    min-height: 660px;
+  }
+  .scene-block {
+    border-radius: 16px;
+    padding: 18px;
+    margin: 12px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .scene-block::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .scene-block.s1 { background: #FFF8F0; border: 1.5px solid #FFE0C0; }
+  .scene-block.s1::after { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+  .scene-block.s2 { background: #F0FAFF; border: 1.5px solid #B3E5FC; }
+  .scene-block.s2::after { background: linear-gradient(90deg, var(--teal), #00D4C8); }
+  .scene-block.s3 { background: #FFF0F3; border: 1.5px solid #FFCCD5; }
+  .scene-block.s3::after { background: linear-gradient(90deg, var(--red), var(--orange)); }
+
+  .scene-role { font-size: 10px; font-weight: 700; letter-spacing: 2px; margin-bottom: 6px; }
+  .scene-role.mgmt { color: var(--red); }
+  .scene-role.eng  { color: var(--teal); }
+  .scene-role.all  { color: var(--orange); }
+  .scene-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .scene-body  { font-size: 13px; color: var(--muted); line-height: 1.85; }
+  .scene-body b { color: var(--ink); }
+  .scene-body .num { color: var(--red); font-weight: 700; }
+  .tip-tag {
+    display: inline-block;
+    background: #E8F5E9;
+    color: #2E7D32;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px;
+    margin-top: 10px;
+  }
+
+  /* ====== CARD 6 · MISTAKES ====== */
+  .card-mistakes {
+    background: linear-gradient(155deg, #0D1B2A 0%, #162032 100%);
+    padding: 36px 30px;
+    min-height: 520px;
+  }
+  .mistake-box {
+    background: rgba(232,0,61,.12);
+    border: 1px solid rgba(232,0,61,.3);
+    border-radius: 16px;
+    padding: 18px;
+    margin: 14px 0;
+  }
+  .mistake-box h4 { font-size: 14px; font-weight: 700; color: #FF6B8A; margin-bottom: 10px; }
+  .mistake-box p  { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.85; }
+  .tips-box {
+    background: rgba(0,180,166,.12);
+    border: 1px solid rgba(0,180,166,.3);
+    border-radius: 16px;
+    padding: 18px;
+    margin: 14px 0;
+  }
+  .tips-box h4 { font-size: 14px; font-weight: 700; color: var(--teal); margin-bottom: 10px; }
+  .tip-item {
+    font-size: 13px; color: rgba(255,255,255,.7);
+    padding: 5px 0; display: flex; gap: 10px; line-height: 1.7;
+  }
+  .tip-item::before { content: '→'; color: var(--yellow); font-weight: 700; flex-shrink: 0; }
+
+  /* ====== CARD 7 · CLOSE ====== */
+  .card-close {
+    background: var(--white);
+    padding: 36px 30px;
+    min-height: 460px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .summary-card {
+    background: linear-gradient(135deg, var(--red) 0%, #C0003A 100%);
+    border-radius: 18px;
+    padding: 24px;
+  }
+  .summary-card p { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.75; }
+  .interact-card {
+    background: var(--cream);
+    border: 1.5px solid #D0E4F7;
+    border-radius: 18px;
+    padding: 20px;
+  }
+  .interact-card h4 { font-size: 13px; font-weight: 700; color: var(--orange); margin-bottom: 10px; }
+  .interact-card p  { font-size: 13px; color: var(--muted); line-height: 1.85; }
+  .interact-card b  { color: var(--ink); }
+  .preview-row {
+    background: var(--dark);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .blink { width: 8px; height: 8px; background: var(--yellow); border-radius: 50%; flex-shrink: 0; margin-top: 4px; animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+  .preview-text { font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.7; }
+  .preview-text b { color: #fff; }
+  .close-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--red), var(--orange), var(--yellow), var(--teal)); }
+
+  /* Nav dots */
+  .nav-dots { display: flex; gap: 6px; justify-content: center; }
+  .nd { width: 6px; height: 6px; border-radius: 50%; background: #C0C8D0; }
+  .nd.on { background: var(--red); width: 20px; border-radius: 3px; }
+
+  .page-label { font-size: 11px; color: #8899AA; letter-spacing: 1px; text-align: center; }
+</style>
+</head>
+<body>
+
+<p class="page-label">📱 小红书图文 · 共7张 · 手机制造厂定制版</p>
+
+<!-- ══ CARD 1 · COVER ══ -->
+<div class="card card-cover">
+  <div class="cover-series">
+    <span class="cover-pill">30天AI科普营</span>
+    <span class="cover-pill-outline">手机制造厂版</span>
+  </div>
+  <div class="cover-phone-icon">📱</div>
+  <div class="cover-day">DAY 01 · 基础概念</div>
+  <div class="cover-word">To<em>ken</em></div>
+  <div class="cover-tagline">
+    厂长拿着AI报价单问我：<br>
+    「这玩意儿按个数收钱，<br>是不是在坑我？」
+  </div>
+  <div class="cover-audience">
+    <span class="audience-tag">👔 管理层</span>
+    <span class="audience-tag">🔧 工程师</span>
+    <span class="audience-tag">📋 品质/IE</span>
+  </div>
+  <div class="cover-bar"></div>
+</div>
+
+<!-- ══ CARD 2 · STORY 管理层视角 ══ -->
+<div class="card card-mgmt">
+  <div class="role-banner mgmt">
+    <div class="role-dot mgmt"></div>
+    <span class="role-label mgmt">管理层视角</span>
+    <span class="role-sub">厂长 / 生产总监 / 项目经理</span>
+  </div>
+
+  <div class="scene-location">📍 会议室 · AI项目预算审核现场</div>
+
+  <p class="body-p">
+    上个月，我们厂长拿着一份AI供应商的报价单走进会议室，把报价单拍在桌上：
+  </p>
+
+  <div class="quote-wrap">
+    <p>小李，这个方案说按Token计费，一个月预计用5000万个Token，这什么单位？我们厂的BOM表才几千行，这AI要消耗这么多？</p>
+    <div class="speaker">— 厂长</div>
+  </div>
+
+  <p class="body-p">
+    我在旁边的IE主管也凑过来：<span class="hl">「而且Input和Output还分开算，这不是坑人吗？」</span>
+  </p>
+  <p class="body-p">
+    其实，他们问的是同一个问题——Token到底是什么单位，凭什么这么算？
+  </p>
+  <p class="body-p">
+    今天我用咱们手机厂的话，把这件事<span class="hl">一次讲透</span>。
+  </p>
+</div>
+
+<!-- ══ CARD 3 · STORY 工程师视角 ══ -->
+<div class="card card-eng">
+  <div class="role-banner eng" style="background:rgba(0,180,166,.12); border-color:rgba(0,180,166,.3);">
+    <div class="role-dot eng"></div>
+    <span class="role-label eng">工程师视角</span>
+    <span class="role-sub" style="color:rgba(255,255,255,.35);">PE / QE / SMT工程师</span>
+  </div>
+
+  <div class="scene-location">📍 工程部 · 用AI工具整理ECN文件</div>
+
+  <p class="body-p">
+    上周，PE工程师小王在用AI整理一批ECN变更文件，把100份文件一次性丢进AI，结果报错了：
+  </p>
+
+  <div class="quote-wrap">
+    <p>Error: Context length exceeded. Your input has 120,000 tokens, but the limit is 100,000 tokens.</p>
+    <div class="speaker" style="color:rgba(255,255,255,.35);">— AI报错信息</div>
+  </div>
+
+  <p class="body-p" style="color:rgba(255,255,255,.75);">
+    小王一脸懵：<span class="hl-teal">「Token限制？我传的是PDF文件又不是在发消息，这跟Token有什么关系？」</span>
+  </p>
+
+  <p class="body-p" style="color:rgba(255,255,255,.75);">
+    这个问题，不只是小王会踩的坑。搞清楚Token是什么，才能知道为什么文件太多会超限，下次怎么绕过去。
+  </p>
+</div>
+
+<!-- ══ CARD 4 · EXPLAIN ══ -->
+<div class="card card-explain">
+  <div class="section-head dark">🏭 用产线逻辑，理解Token</div>
+
+  <p class="body-p">
+    咱们手机厂最熟悉的流程就是：<br>
+    <strong>原材料进料 → SMT贴片 → 组装测试 → 出货</strong>
+  </p>
+  <p class="body-p">AI处理文字，是完全相同的逻辑：</p>
+
+  <table class="analogy-table">
+    <tr>
+      <th class="left">🏭 手机产线</th>
+      <th class="right">🤖 AI处理流程</th>
+    </tr>
+    <tr>
+      <td>你投进去的物料（颗粒/片）</td>
+      <td>你发给AI的文字（Input）</td>
+    </tr>
+    <tr>
+      <td>SMT贴片 + 回流焊接</td>
+      <td>大模型推理计算</td>
+    </tr>
+    <tr>
+      <td>产出的PCBA板</td>
+      <td>AI回给你的答案（Output）</td>
+    </tr>
+    <tr>
+      <td>物料计量单位（颗、片、克）</td>
+      <td class="special">Token（AI的计量单位）✦</td>
+    </tr>
+  </table>
+
+  <div class="stat-row">
+    <div class="stat-chip">中文 1字 ≈ <span>1~2 Token</span></div>
+    <div class="stat-chip">英文 1词 ≈ <span>1~2 Token</span></div>
+    <div class="stat-chip">A4纸1页 ≈ <span>约800 Token</span></div>
+  </div>
+
+  <div class="info-box">
+    <p>💡 <strong>为什么按Token收钱？</strong><br>
+    就像你的SMT贴片机，贴一颗料就耗一次电、走一次程序。AI处理一个Token，背后的服务器就消耗一次算力——<strong>这就是成本的来源。</strong></p>
+    <p class="note">Input Token（你发的）+ Output Token（AI回的）= 总费用</p>
+  </div>
+</div>
+
+<!-- ══ CARD 5 · SCENES ══ -->
+<div class="card card-scenes">
+  <div class="section-head orange">🏭 手机厂3个真实使用场景</div>
+
+  <div class="scene-block s1">
+    <div class="scene-role mgmt">👔 管理层 · 采购决策</div>
+    <div class="scene-title">📋 审核AI知识库方案报价</div>
+    <div class="scene-body">
+      想把<b>作业指导书SOP、品质标准、设备维修手册</b>全部做成AI知识库……<br>
+      1份SOP约3000字 × 500份 = <b class="num">150万字</b><br>
+      150万字 ÷ 1.5 ≈ <b class="num">约100万 Token</b><br>
+      一次性导入成本就算清楚了，再也不被供应商糊弄。
+    </div>
+    <span class="tip-tag">💡 先估Token，再谈报价</span>
+  </div>
+
+  <div class="scene-block s2">
+    <div class="scene-role eng">🔧 PE/QE工程师 · 日常使用</div>
+    <div class="scene-title">📄 用AI整理ECN变更文件</div>
+    <div class="scene-body">
+      把ECN文件丢给AI分析时，<b>一次不要超过模型的Token上限</b>。<br>
+      报错"Context length exceeded"= 文件太长超过Token限制。<br>
+      解决方法：<b class="num">分批上传</b>，每批不超过限制的80%。
+    </div>
+    <span class="tip-tag">💡 分批处理，避免报错</span>
+  </div>
+
+  <div class="scene-block s3">
+    <div class="scene-role all">📋 品质/IE · 效率提升</div>
+    <div class="scene-title">📊 AI生成每日AOI缺陷报告</div>
+    <div class="scene-body">
+      每天用AI汇总AOI缺陷数据、生成品质日报，约2000字/份。<br>
+      一个月22个工作日 × 2000字 ÷ 1.5 ≈ <b class="num">约3万Token/月</b><br>
+      这点用量成本极低，但每天能省下工程师<b>1小时以上</b>的手工整理时间。
+    </div>
+    <span class="tip-tag">💡 低成本，高回报</span>
+  </div>
+</div>
+
+<!-- ══ CARD 6 · MISTAKES ══ -->
+<div class="card card-mistakes">
+  <div class="section-head yellow">❌ 误区 + ✅ 省钱技巧</div>
+
+  <div class="mistake-box">
+    <h4>❌ 「给AI的指令越详细越好？」——错！</h4>
+    <p>
+      很多工程师把整份产品规格书直接粘给AI，其实大部分内容AI根本用不到——<br>
+      这些废Token全部变成你多花的钱，而且信息太多反而让AI抓不住重点。
+    </p>
+  </div>
+
+  <div class="tips-box">
+    <h4>✅ 手机厂3个省Token技巧</h4>
+    <div class="tip-item">只给AI它需要的内容。比如问AOI缺陷分析，只传当班的缺陷数据，不要传整月记录</div>
+    <div class="tip-item">指令要像工单一样精确：工序、要求、输出格式写清楚，少废话</div>
+    <div class="tip-item">重复任务做成模板，固定格式的报告让AI套模板输出，大幅节省Token</div>
+  </div>
+</div>
+
+<!-- ══ CARD 7 · CLOSE ══ -->
+<div class="card card-close">
+  <div class="section-head red">💡 一句话总结</div>
+
+  <div class="summary-card">
+    <p>Token 是 AI 处理文字的计量单位，<br>就像我们产线贴的每一颗料。<br><br>
+    懂了Token，厂长能看懂AI报价，<br>工程师能避开报错的坑。</p>
+  </div>
+
+  <div class="interact-card">
+    <h4>💬 今天的互动问题</h4>
+    <p>你们厂有没有用过AI工具？<br>
+    是遇到过<b>「文件太大上传报错」</b>，还是<b>「AI报价看不懂」</b>的情况？<br><br>
+    评论区聊聊，我们一起把坑踩平 👇</p>
+  </div>
+
+  <div class="preview-row">
+    <div class="blink"></div>
+    <div class="preview-text">
+      明天预告：<b>Prompt（提示词）</b><br>
+      同样是让AI写品质报告，为什么有人3秒出结果，有人来回改10次？秘密就在Prompt。
+    </div>
+  </div>
+
+  <div class="close-bar"></div>
+</div>
+
+<div class="nav-dots">
+  <div class="nd on"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+</div>
+
+<p class="page-label" style="margin-bottom:24px;">📚 30天AI术语科普营 · 手机制造厂内部科普版</p>
+
+</body>
+</html>
