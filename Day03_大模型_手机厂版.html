@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI术语科普营 · Day 03 · 大模型 · 手机制造厂版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --green:    #00897B;
+    --emerald:  #00BFA5;
+    --lime:     #C6F135;
+    --gold:     #FFD166;
+    --red:      #E8003D;
+    --orange:   #FF6B35;
+    --dark:     #071A14;
+    --forest:   #0B2318;
+    --ink:      #1A2E26;
+    --muted:    #6B8C80;
+    --cream:    #F2FAF7;
+    --white:    #FFFFFF;
+    --card-w:   390px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#DDE8E4;
+    font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    gap:20px; padding:40px 20px;
+  }
+  .card {
+    width:var(--card-w); border-radius:20px; overflow:hidden;
+    box-shadow:0 6px 32px rgba(0,0,0,.14); position:relative;
+  }
+
+  /* ══ CARD 1 COVER ══ */
+  .card-cover {
+    background:var(--dark); min-height:540px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:40px 34px;
+  }
+  .card-cover::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 80% 5%,  #00897B50 0%, transparent 55%),
+      radial-gradient(ellipse at 10% 85%, #00BFA525 0%, transparent 50%);
+  }
+  /* factory floor grid */
+  .card-cover::after {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(0,191,165,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,191,165,.05) 1px, transparent 1px);
+    background-size:36px 36px;
+  }
+  .cover-series {
+    position:absolute; top:28px; left:34px;
+    display:flex; gap:8px; align-items:center; z-index:2;
+  }
+  .cover-pill { background:var(--green); color:#fff; font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; letter-spacing:1px; }
+  .cover-pill-o { border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.5); font-size:11px; padding:5px 12px; border-radius:20px; letter-spacing:1px; }
+
+  /* size comparison decorative circles */
+  .cover-circles {
+    position:absolute; top:52px; right:24px; z-index:1;
+    display:flex; align-items:flex-end; gap:6px;
+  }
+  .circle-sm {
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(198,241,53,.15); border:1.5px solid rgba(198,241,53,.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:9px; color:rgba(198,241,53,.6); font-weight:700;
+  }
+  .circle-md {
+    width:60px; height:60px; border-radius:50%;
+    background:rgba(0,191,165,.12); border:1.5px solid rgba(0,191,165,.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; color:rgba(0,191,165,.7); font-weight:700;
+  }
+  .circle-lg {
+    width:96px; height:96px; border-radius:50%;
+    background:rgba(0,137,123,.18); border:2px solid rgba(0,137,123,.4);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; color:rgba(0,191,165,.9); font-weight:700;
+    box-shadow:0 0 30px rgba(0,137,123,.3);
+  }
+
+  .cover-day { font-size:11px; color:rgba(255,255,255,.35); letter-spacing:4px; margin-bottom:10px; position:relative; z-index:2; }
+  .cover-word { font-size:74px; font-weight:900; color:#fff; line-height:.92; letter-spacing:-2px; position:relative; z-index:2; }
+  .cover-word em { font-style:normal; color:var(--lime); text-shadow:0 0 40px rgba(198,241,53,.4); }
+  .cover-sub { font-size:14px; color:rgba(255,255,255,.28); letter-spacing:3px; margin-top:6px; margin-bottom:0; position:relative; z-index:2; }
+  .cover-tagline {
+    font-size:14px; color:rgba(255,255,255,.62); margin-top:18px; line-height:1.75;
+    border-left:3px solid var(--emerald); padding-left:14px; position:relative; z-index:2;
+  }
+  .cover-audience { position:absolute; bottom:52px; right:34px; display:flex; flex-direction:column; gap:5px; z-index:2; align-items:flex-end; }
+  .aud-tag { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); color:rgba(255,255,255,.5); font-size:10px; padding:3px 10px; border-radius:10px; }
+  .cover-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg, var(--green), var(--emerald), var(--lime)); }
+
+  /* ══ SHARED ══ */
+  .role-banner { display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:12px; margin-bottom:20px; }
+  .role-banner.mgmt { background:#FFF0F3; border:1.5px solid #FFCCD5; }
+  .role-banner.eng  { background:#F0FBF9; border:1.5px solid #B2DFDB; }
+  .role-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .role-dot.mgmt { background:var(--red); }
+  .role-dot.eng  { background:var(--green); }
+  .role-label { font-size:12px; font-weight:700; letter-spacing:1px; }
+  .role-label.mgmt { color:var(--red); }
+  .role-label.eng  { color:var(--green); }
+  .role-sub { font-size:11px; color:var(--muted); margin-left:auto; }
+  .scene-loc { font-size:12px; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+  .body-p { font-size:14px; color:var(--ink); line-height:1.95; margin-bottom:14px; }
+  .quote-wrap { border-left:4px solid var(--orange); border-radius:0 14px 14px 0; padding:16px 18px; margin:16px 0; position:relative; }
+  .quote-wrap::before { content:'"'; position:absolute; top:-6px; left:14px; font-size:44px; opacity:.2; line-height:1; color:var(--orange); }
+  .quote-wrap p { font-size:13.5px; color:var(--ink); line-height:1.85; font-style:italic; }
+  .quote-wrap .spk { font-size:11px; color:var(--muted); margin-top:8px; font-style:normal; font-weight:600; }
+  .hl-green { font-weight:700; color:var(--green); }
+  .hl-red   { font-weight:700; color:var(--red); }
+
+  /* ══ CARD 2 管理层 ══ */
+  .card-mgmt { background:var(--white); padding:36px 30px; min-height:600px; }
+  .quote-wrap.mgmt-q { background:#FFFBF0; }
+
+  /* supplier comparison table */
+  .vendor-table { width:100%; border-collapse:collapse; margin:14px 0; border-radius:12px; overflow:hidden; }
+  .vendor-table th { padding:10px 12px; font-size:12px; font-weight:700; letter-spacing:1px; text-align:left; }
+  .vendor-table th.l { background:var(--green); color:#fff; }
+  .vendor-table th.r { background:#455A64; color:#fff; }
+  .vendor-table td { padding:9px 12px; font-size:12.5px; color:var(--ink); vertical-align:top; border-bottom:1px solid #EEF5F3; }
+  .vendor-table tr:last-child td { border-bottom:none; }
+  .vendor-table tr:nth-child(even) td { background:#F7FCFA; }
+  .vendor-table td.key { font-weight:700; color:var(--green); white-space:nowrap; }
+  .warn-tag { display:inline-block; background:#FFF3CD; border:1px solid #FFD166; border-radius:8px; padding:3px 10px; font-size:11px; color:#856404; font-weight:700; margin-top:4px; }
+
+  /* ══ CARD 3 工程师 ══ */
+  .card-eng { background:var(--forest); padding:36px 30px; min-height:570px; }
+  .card-eng::before {
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(0,191,165,.05) 1px, transparent 1px),linear-gradient(90deg,rgba(0,191,165,.05) 1px, transparent 1px);
+    background-size:28px 28px;
+  }
+  .card-eng .body-p { color:rgba(255,255,255,.72); }
+  .card-eng .quote-wrap { background:rgba(255,255,255,.05); border-left-color:var(--emerald); }
+  .card-eng .quote-wrap::before { color:var(--emerald); }
+  .card-eng .quote-wrap p { color:rgba(255,255,255,.82); }
+  .card-eng .quote-wrap .spk { color:rgba(255,255,255,.32); }
+  .card-eng .scene-loc { color:rgba(255,255,255,.3); }
+
+  /* model size visual */
+  .model-visual {
+    background:rgba(0,0,0,.3); border:1px solid rgba(0,191,165,.2);
+    border-radius:14px; padding:18px; margin:14px 0;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .model-row { display:flex; align-items:center; gap:10px; }
+  .model-name { font-size:12px; font-weight:700; width:60px; flex-shrink:0; }
+  .model-bar { height:24px; border-radius:6px; display:flex; align-items:center; padding:0 10px; position:relative; overflow:hidden; }
+  .model-bar::after { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:rgba(255,255,255,.08); border-radius:6px 6px 0 0; }
+  .model-bar span { font-size:11px; font-weight:700; color:#fff; position:relative; z-index:1; white-space:nowrap; }
+  .bar-sm  { background:rgba(0,137,123,.5); border:1px solid rgba(0,137,123,.6); width:28%; }
+  .bar-md  { background:rgba(0,137,123,.7); border:1px solid rgba(0,191,165,.5); width:55%; }
+  .bar-lg  { background:linear-gradient(90deg,#00897B,#00BFA5); border:1px solid #00BFA5; width:90%; box-shadow:0 0 12px rgba(0,191,165,.3); }
+  .model-note { font-size:11px; color:rgba(255,255,255,.4); }
+
+  /* ══ CARD 4 解释 ══ */
+  .card-explain { background:var(--cream); padding:36px 30px; min-height:640px; }
+  .section-head { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:7px 16px; border-radius:10px; margin-bottom:22px; }
+  .section-head.green  { background:var(--green);   color:#fff; }
+  .section-head.dark   { background:var(--dark);    color:#fff; }
+  .section-head.orange { background:var(--orange);  color:#fff; }
+  .section-head.red    { background:var(--red);     color:#fff; }
+  .section-head.gold   { background:var(--gold);    color:var(--ink); }
+
+  /* production line analogy */
+  .line-analogy { margin:14px 0; display:flex; flex-direction:column; gap:10px; }
+  .line-row { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; }
+  .line-box {
+    background:var(--white); border-radius:12px; padding:12px;
+    border:1.5px solid #B2DFDB; text-align:center;
+  }
+  .line-box.accent { background:var(--green); border-color:var(--green); }
+  .line-box .lb-label { font-size:10px; color:var(--muted); margin-bottom:3px; letter-spacing:1px; }
+  .line-box .lb-val   { font-size:14px; font-weight:700; color:var(--ink); }
+  .line-box.accent .lb-label { color:rgba(255,255,255,.6); }
+  .line-box.accent .lb-val   { color:#fff; }
+  .line-arrow { font-size:20px; color:var(--green); opacity:.5; text-align:center; }
+
+  .compare-card {
+    border-radius:16px; padding:16px; margin:10px 0;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .compare-card.small { background:#FFF8F0; border:1.5px solid #FFD9B3; }
+  .compare-card.large { background:#F0FBF9; border:1.5px solid #B2DFDB; }
+  .cc-icon { font-size:28px; flex-shrink:0; }
+  .cc-title { font-size:14px; font-weight:700; color:var(--ink); margin-bottom:6px; }
+  .cc-body  { font-size:12.5px; color:var(--muted); line-height:1.8; }
+  .cc-body b { color:var(--ink); }
+
+  /* ══ CARD 5 实战场景 ══ */
+  .card-scenes { background:var(--white); padding:36px 30px; min-height:660px; }
+  .scene-block { border-radius:16px; padding:18px; margin:12px 0; position:relative; overflow:hidden; }
+  .scene-block::after { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+  .scene-block.s1 { background:#FFF8F0; border:1.5px solid #FFE0C0; }
+  .scene-block.s1::after { background:linear-gradient(90deg,var(--orange),var(--gold)); }
+  .scene-block.s2 { background:#F0FBF9; border:1.5px solid #B2DFDB; }
+  .scene-block.s2::after { background:linear-gradient(90deg,var(--green),var(--emerald)); }
+  .scene-block.s3 { background:#F3FDF9; border:1.5px solid #A5D6A7; }
+  .scene-block.s3::after { background:linear-gradient(90deg,#43A047,var(--emerald)); }
+  .scene-role { font-size:10px; font-weight:700; letter-spacing:2px; margin-bottom:6px; }
+  .scene-role.mgmt { color:var(--red); }
+  .scene-role.eng  { color:var(--green); }
+  .scene-role.all  { color:#2E7D32; }
+  .scene-title { font-size:15px; font-weight:700; color:var(--ink); margin-bottom:8px; }
+  .scene-body  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .scene-body b { color:var(--ink); }
+  .decision-box {
+    background:rgba(0,0,0,.04); border-radius:10px;
+    padding:10px 12px; margin:10px 0;
+    font-size:12.5px; color:var(--ink); line-height:1.75;
+    border-left:3px solid var(--green);
+  }
+  .decision-box b { color:var(--green); }
+  .tip-tag { display:inline-block; background:#E8F5E9; color:#2E7D32; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; margin-top:10px; }
+
+  /* ══ CARD 6 误区 ══ */
+  .card-mistakes { background:linear-gradient(155deg,var(--dark) 0%,var(--forest) 100%); padding:36px 30px; min-height:520px; }
+  .mistake-box { background:rgba(232,0,61,.1); border:1px solid rgba(232,0,61,.25); border-radius:16px; padding:16px; margin:12px 0; }
+  .mistake-box h4 { font-size:13px; font-weight:700; color:#FF6B8A; margin-bottom:8px; }
+  .mistake-box p  { font-size:13px; color:rgba(255,255,255,.65); line-height:1.8; }
+  .tips-box { background:rgba(0,191,165,.1); border:1px solid rgba(0,191,165,.25); border-radius:16px; padding:16px; margin:12px 0; }
+  .tips-box h4 { font-size:13px; font-weight:700; color:var(--emerald); margin-bottom:8px; }
+  .tip-item { font-size:13px; color:rgba(255,255,255,.65); padding:5px 0; display:flex; gap:10px; line-height:1.7; }
+  .tip-item::before { content:'→'; color:var(--lime); font-weight:700; flex-shrink:0; }
+
+  /* size guide table inside card 6 */
+  .size-guide { width:100%; border-collapse:collapse; margin:14px 0; border-radius:10px; overflow:hidden; }
+  .size-guide th { background:var(--green); color:#fff; font-size:12px; font-weight:700; padding:8px 12px; text-align:left; }
+  .size-guide td { padding:8px 12px; font-size:12px; color:rgba(255,255,255,.7); border-bottom:1px solid rgba(255,255,255,.07); }
+  .size-guide tr:last-child td { border-bottom:none; }
+  .size-guide td.hl { color:var(--lime); font-weight:700; }
+
+  /* ══ CARD 7 CLOSE ══ */
+  .card-close { background:var(--white); padding:36px 30px; min-height:460px; display:flex; flex-direction:column; gap:18px; }
+  .summary-card { background:linear-gradient(135deg,var(--green) 0%,var(--emerald) 100%); border-radius:18px; padding:24px; }
+  .summary-card p { font-size:15px; font-weight:700; color:#fff; line-height:1.75; }
+  .interact-card { background:var(--cream); border:1.5px solid #B2DFDB; border-radius:18px; padding:20px; }
+  .interact-card h4 { font-size:13px; font-weight:700; color:var(--green); margin-bottom:10px; }
+  .interact-card p  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .interact-card b  { color:var(--ink); }
+  .preview-row { background:var(--dark); border-radius:14px; padding:14px 18px; display:flex; align-items:flex-start; gap:12px; }
+  .blink { width:8px; height:8px; background:var(--lime); border-radius:50%; flex-shrink:0; margin-top:4px; animation:blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+  .preview-text { font-size:13px; color:rgba(255,255,255,.55); line-height:1.7; }
+  .preview-text b { color:#fff; }
+  .close-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--green),var(--emerald),var(--lime)); }
+
+  .nav-dots { display:flex; gap:6px; justify-content:center; }
+  .nd { width:6px; height:6px; border-radius:50%; background:#B0C4BC; }
+  .nd.on { background:var(--green); width:20px; border-radius:3px; }
+  .page-label { font-size:11px; color:#7A9A8F; letter-spacing:1px; text-align:center; }
+</style>
+</head>
+<body>
+
+<p class="page-label">📱 小红书图文 · 共7张 · 手机制造厂版 · Day 03</p>
+
+<!-- ══ CARD 1 · COVER ══ -->
+<div class="card card-cover">
+  <div class="cover-series">
+    <span class="cover-pill">30天AI科普营</span>
+    <span class="cover-pill-o">Day 03</span>
+  </div>
+
+  <!-- size circles decorative -->
+  <div class="cover-circles">
+    <div class="circle-sm">7B</div>
+    <div class="circle-md">32B</div>
+    <div class="circle-lg">671B</div>
+  </div>
+
+  <div class="cover-day">DAY 03 · 基础概念</div>
+  <div class="cover-word"><em>大</em>模型</div>
+  <div class="cover-sub">LARGE LANGUAGE MODEL</div>
+  <div class="cover-tagline">
+    供应商说「我们大模型什么都能做」——<br>
+    大，到底大在哪里？<br>
+    我们手机厂，真的需要最大的吗？
+  </div>
+  <div class="cover-audience">
+    <span class="aud-tag">👔 管理层</span>
+    <span class="aud-tag">🔧 工程师</span>
+    <span class="aud-tag">📋 品质/IE</span>
+  </div>
+  <div class="cover-bar"></div>
+</div>
+
+<!-- ══ CARD 2 · 管理层视角 ══ -->
+<div class="card card-mgmt">
+  <div class="role-banner mgmt">
+    <div class="role-dot mgmt"></div>
+    <span class="role-label mgmt">管理层视角</span>
+    <span class="role-sub">厂长 / 生产总监 / 项目经理</span>
+  </div>
+
+  <div class="scene-loc">📍 采购会议室 · AI系统选型评审</div>
+
+  <p class="body-p">上个月，我们在做AI质检系统选型，同时来了三家供应商。三家报价差了一倍，原因是模型大小不同。</p>
+
+  <div class="quote-wrap mgmt-q">
+    <p>我们用的是千亿参数大模型，行业最顶级，什么场景都能覆盖，效果最好！</p>
+    <div class="spk">— A供应商（报价最高）</div>
+  </div>
+  <div class="quote-wrap mgmt-q">
+    <p>我们针对制造业做了专项训练，用的是320亿参数模型，质检准确率比千亿模型还高5%，部署成本低60%。</p>
+    <div class="spk">— B供应商</div>
+  </div>
+
+  <p class="body-p">厂长当场懵了：<span class="hl-red">「参数越大不是越好吗？为什么小的反而更准？」</span></p>
+  <p class="body-p">这个问题，今天讲清楚。</p>
+
+  <table class="vendor-table">
+    <tr><th class="l">维度</th><th class="r">大≠更好的原因</th></tr>
+    <tr><td class="key">参数量</td><td>越大能力越通用，但未必适合你的具体场景</td></tr>
+    <tr><td class="key">专项训练</td><td>在制造业数据上微调的中等模型，往往比大模型更准</td></tr>
+    <tr><td class="key">部署成本</td><td>千亿模型需要数十张A100显卡，费用是小模型10倍以上</td></tr>
+    <tr><td class="key">响应速度</td><td>大模型推理慢，生产线实时质检可能来不及</td></tr>
+  </table>
+  <div class="warn-tag">⚠️ 买AI不是买手机，参数大≠性价比高</div>
+</div>
+
+<!-- ══ CARD 3 · 工程师视角 ══ -->
+<div class="card card-eng">
+  <div class="role-banner eng" style="background:rgba(0,191,165,.1);border-color:rgba(0,191,165,.3);">
+    <div class="role-dot eng"></div>
+    <span class="role-label eng">工程师视角</span>
+    <span class="role-sub" style="color:rgba(255,255,255,.3);">PE / QE / 算法工程师</span>
+  </div>
+
+  <div class="scene-loc">📍 IT部门 · 评估AI工具部署方案</div>
+
+  <p class="body-p">IT工程师小张负责评估公司要引进的AI编程辅助工具，对比了两款：</p>
+
+  <div class="model-visual">
+    <div class="model-row">
+      <div class="model-name" style="color:rgba(255,255,255,.5);font-size:11px;">GPT-4o<br><span style="color:rgba(255,255,255,.3);font-size:10px;">通用大模型</span></div>
+      <div class="model-bar bar-lg"><span>千亿级参数 · 云端 · 响应2-5秒 · 贵</span></div>
+    </div>
+    <div class="model-row">
+      <div class="model-name" style="color:rgba(255,255,255,.5);font-size:11px;">Qwen2.5<br><span style="color:rgba(255,255,255,.3);font-size:10px;">本地部署</span></div>
+      <div class="model-bar bar-md"><span>320亿参数 · 本地 · 响应0.5秒 · 省</span></div>
+    </div>
+    <div class="model-row">
+      <div class="model-name" style="color:rgba(255,255,255,.5);font-size:11px;">专用小模型<br><span style="color:rgba(255,255,255,.3);font-size:10px;">质检专用</span></div>
+      <div class="model-bar bar-sm"><span>70亿 · 嵌入端侧</span></div>
+    </div>
+  </div>
+
+  <div class="quote-wrap" style="background:rgba(255,255,255,.05);border-left-color:var(--emerald);">
+    <p style="color:rgba(255,255,255,.8);">我们工厂数据不能上云，用千亿云端模型直接排除。本地部署的320亿刚好够用，而且响应速度快，适合产线实时反馈。</p>
+    <div class="spk" style="color:rgba(255,255,255,.35);">— 小张的结论</div>
+  </div>
+
+  <p class="body-p">选模型不是选最大的，<span style="color:var(--lime);font-weight:700;">是选最合适的。</span></p>
+</div>
+
+<!-- ══ CARD 4 · EXPLAIN ══ -->
+<div class="card card-explain">
+  <div class="section-head dark">🏭 用产线规模，理解大模型</div>
+
+  <p class="body-p">「大模型」的「大」，大在<strong>参数量</strong>——可以理解成模型大脑里的「神经元连接数」。</p>
+  <p class="body-p">用咱们手机厂的产线来打比方：</p>
+
+  <div class="line-analogy">
+    <div class="line-row">
+      <div class="line-box">
+        <div class="lb-label">小作坊</div>
+        <div class="lb-val">10个工人</div>
+      </div>
+      <div class="line-arrow">↔</div>
+      <div class="line-box">
+        <div class="lb-label">小模型</div>
+        <div class="lb-val">70亿参数</div>
+      </div>
+    </div>
+    <div class="line-row">
+      <div class="line-box">
+        <div class="lb-label">中型工厂</div>
+        <div class="lb-val">500人产线</div>
+      </div>
+      <div class="line-arrow">↔</div>
+      <div class="line-box">
+        <div class="lb-label">中型模型</div>
+        <div class="lb-val">320亿参数</div>
+      </div>
+    </div>
+    <div class="line-row">
+      <div class="line-box accent">
+        <div class="lb-label">超级工厂</div>
+        <div class="lb-val">10万人规模</div>
+      </div>
+      <div class="line-arrow">↔</div>
+      <div class="line-box accent">
+        <div class="lb-label">大模型</div>
+        <div class="lb-val">千亿级参数</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="body-p" style="margin-top:14px;">但规模大不等于产品适合你：</p>
+
+  <div class="compare-card small">
+    <div class="cc-icon">🏭</div>
+    <div>
+      <div class="cc-title">超级工厂 ≠ 你需要的供应商</div>
+      <div class="cc-body">你只需要定制<b>手机后壳配件</b>，找一个<b>专精此道的中小厂</b>，比找富士康更高效、更便宜、响应更快</div>
+    </div>
+  </div>
+
+  <div class="compare-card large">
+    <div class="cc-icon">🤖</div>
+    <div>
+      <div class="cc-title">大模型 ≠ 你工厂的最佳选择</div>
+      <div class="cc-body">你只需要<b>AI质检缺陷识别</b>，一个在制造业数据上专项训练过的<b>中型模型</b>，准确率更高、部署成本更低</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARD 5 · 实战场景 ══ -->
+<div class="card card-scenes">
+  <div class="section-head green">🏭 手机厂3个选模型的真实场景</div>
+
+  <div class="scene-block s1">
+    <div class="scene-role mgmt">👔 管理层 · 采购决策</div>
+    <div class="scene-title">🛒 评估AI供应商时，怎么问模型大小</div>
+    <div class="scene-body">
+      供应商报价时，直接问这3个问题：
+    </div>
+    <div class="decision-box">
+      1. 你用的是什么模型？<b>参数量多少？</b><br>
+      2. 有没有在<b>制造业/手机厂数据</b>上做过专项训练？<br>
+      3. <b>能不能本地部署</b>？数据不出厂区？
+    </div>
+    <span class="tip-tag">💡 问不出这3个答案，不要签合同</span>
+  </div>
+
+  <div class="scene-block s2">
+    <div class="scene-role eng">🔧 工程师 · 技术选型</div>
+    <div class="scene-title">⚙️ 为不同场景选合适的模型规模</div>
+    <div class="scene-body">
+      不同任务对模型大小的需求完全不同：
+    </div>
+    <div class="decision-box">
+      <b>日常文档/报告生成</b> → 70亿参数已够用，本地跑，快且省<br>
+      <b>复杂分析/多语言</b> → 320亿参数，云端或高配本地服务器<br>
+      <b>产线实时质检视觉</b> → 专用小模型，嵌入设备端侧，毫秒响应
+    </div>
+    <span class="tip-tag">💡 场景不同，模型选择完全不同</span>
+  </div>
+
+  <div class="scene-block s3">
+    <div class="scene-role all">📋 全员 · 日常理解</div>
+    <div class="scene-title">📐 怎么记住参数量的大小感</div>
+    <div class="scene-body">
+      一个简单的记忆方法：
+    </div>
+    <div class="decision-box">
+      <b>7B（70亿）</b> = 手机上能跑，速度快，能力基础<br>
+      <b>32B（320亿）</b> = 需要一台好的工作站，能力强<br>
+      <b>671B（千亿+）</b> = 数据中心级，ChatGPT这个级别
+    </div>
+    <span class="tip-tag">💡 B = Billion = 十亿，记住这个单位</span>
+  </div>
+</div>
+
+<!-- ══ CARD 6 · 误区+技巧 ══ -->
+<div class="card card-mistakes">
+  <div class="section-head gold">❌ 误区 + ✅ 选型技巧</div>
+
+  <div class="mistake-box">
+    <h4>❌ 误区一：参数越大，效果越好</h4>
+    <p>在通用任务上，大模型确实更强。但在<b style="color:#FF6B8A;">垂直制造业场景</b>，一个专项微调过的中型模型，往往胜过什么都会但什么都不精的超大模型。</p>
+  </div>
+
+  <div class="mistake-box">
+    <h4>❌ 误区二：模型越新越好</h4>
+    <p>新模型≠适合你的场景。去年的老模型如果在你工厂的缺陷图像上训练过，效果可能远好于今年最新的通用大模型。</p>
+  </div>
+
+  <table class="size-guide">
+    <tr><th>工厂场景</th><th>推荐模型规模</th></tr>
+    <tr><td>写报告/文档整理</td><td class="hl">7B～32B 本地部署</td></tr>
+    <tr><td>AOI视觉质检</td><td class="hl">专用视觉小模型</td></tr>
+    <tr><td>ECN文件分析</td><td class="hl">32B～70B</td></tr>
+    <tr><td>多语言客户沟通</td><td class="hl">云端大模型</td></tr>
+  </table>
+
+  <div class="tips-box">
+    <h4>✅ 选模型的3个核心问题</h4>
+    <div class="tip-item">数据能不能出厂区？不能 → 优先本地部署小模型</div>
+    <div class="tip-item">有没有制造业专项训练？有 → 比盲目选大模型更值</div>
+    <div class="tip-item">响应速度要求高吗？实时产线 → 必须选端侧小模型</div>
+  </div>
+</div>
+
+<!-- ══ CARD 7 · CLOSE ══ -->
+<div class="card card-close">
+  <div class="section-head green">💡 一句话总结</div>
+
+  <div class="summary-card">
+    <p>大模型的「大」是参数量大，能力更通用。<br><br>
+    但对手机厂来说，<b>专项训练过的中型模型</b>往往比千亿大模型更准、更快、更省钱。<br><br>
+    选AI，不选最大的，选最合适的。</p>
+  </div>
+
+  <div class="interact-card">
+    <h4>💬 今天的互动问题</h4>
+    <p>你们厂现在用或者评估过的AI工具，<br>
+    供应商有没有跟你说过模型参数量是多少？<br>
+    有没有问过他们<b>「数据能不能本地部署」</b>？<br><br>
+    评论区说说，我帮你判断选型是否合理 👇</p>
+  </div>
+
+  <div class="preview-row">
+    <div class="blink"></div>
+    <div class="preview-text">
+      明天预告：<b>上下文窗口</b><br>
+      PE工程师把100份ECN文件一次丢进AI，为什么报错了？这个坑90%的人都踩过。
+    </div>
+  </div>
+
+  <div class="close-bar"></div>
+</div>
+
+<div class="nav-dots">
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd on"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+</div>
+
+<p class="page-label" style="margin-bottom:24px;">📚 30天AI术语科普营 · 手机制造厂内部科普版 · Day 03</p>
+
+</body>
+</html>
