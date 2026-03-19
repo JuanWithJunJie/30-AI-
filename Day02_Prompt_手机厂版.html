@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI术语科普营 · Day 02 · Prompt · 手机制造厂版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --blue:    #1A73E8;
+    --indigo:  #3D5AFE;
+    --teal:    #00B4A6;
+    --orange:  #FF6B35;
+    --yellow:  #FFD166;
+    --red:     #E8003D;
+    --dark:    #0A1628;
+    --navy:    #0D2144;
+    --ink:     #1C2B3A;
+    --muted:   #6B7A8D;
+    --cream:   #F4F8FF;
+    --white:   #FFFFFF;
+    --card-w:  390px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #E8EDF5;
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px 20px;
+  }
+
+  .card {
+    width: var(--card-w);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 6px 32px rgba(0,0,0,.13);
+    position: relative;
+  }
+
+  /* ====== CARD 1 · COVER ====== */
+  .card-cover {
+    background: var(--dark);
+    min-height: 540px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 40px 34px;
+  }
+  .card-cover::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 85% 8%,  #1A73E840 0%, transparent 52%),
+      radial-gradient(ellipse at 15% 80%, #3D5AFE25 0%, transparent 50%);
+    pointer-events: none;
+  }
+  /* code grid texture */
+  .card-cover::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(26,115,232,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,115,232,.06) 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
+  }
+  .cover-series {
+    position: absolute; top: 28px; left: 34px;
+    display: flex; gap: 8px; align-items: center; z-index: 2;
+  }
+  .cover-pill {
+    background: var(--blue);
+    color: #fff; font-size: 11px; font-weight: 700;
+    padding: 5px 12px; border-radius: 20px; letter-spacing: 1px;
+  }
+  .cover-pill-outline {
+    border: 1px solid rgba(255,255,255,.2);
+    color: rgba(255,255,255,.55); font-size: 11px;
+    padding: 5px 12px; border-radius: 20px; letter-spacing: 1px;
+  }
+  /* decorative background code text */
+  .cover-code-bg {
+    position: absolute; top: 55px; right: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px; color: rgba(26,115,232,.12);
+    line-height: 1.8; z-index: 1; text-align: right;
+  }
+  .cover-day {
+    font-size: 11px; color: rgba(255,255,255,.38);
+    letter-spacing: 4px; margin-bottom: 10px;
+    position: relative; z-index: 2;
+  }
+  .cover-word {
+    font-size: 78px; font-weight: 900;
+    color: var(--white); line-height: .92;
+    letter-spacing: -2px; position: relative; z-index: 2;
+  }
+  .cover-word em {
+    font-style: normal;
+    background: linear-gradient(90deg, #1A73E8, #3D5AFE, #00B4A6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cover-en {
+    font-size: 13px; color: rgba(255,255,255,.3);
+    letter-spacing: 4px; margin-top: 6px; margin-bottom: 0;
+    position: relative; z-index: 2;
+    font-family: 'Courier New', monospace;
+  }
+  .cover-tagline {
+    font-size: 14px; color: rgba(255,255,255,.6);
+    margin-top: 18px; line-height: 1.75;
+    border-left: 3px solid var(--blue);
+    padding-left: 14px; position: relative; z-index: 2;
+  }
+  .cover-audience {
+    position: absolute; bottom: 52px; right: 34px;
+    display: flex; flex-direction: column; gap: 5px;
+    z-index: 2; align-items: flex-end;
+  }
+  .audience-tag {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.14);
+    color: rgba(255,255,255,.55); font-size: 10px;
+    padding: 3px 10px; border-radius: 10px;
+  }
+  .cover-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--blue), var(--indigo), var(--teal));
+  }
+
+  /* ====== SHARED SECTION STYLES ====== */
+  .role-banner {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: 12px; margin-bottom: 20px;
+  }
+  .role-banner.mgmt { background: #FFF0F3; border: 1.5px solid #FFCCD5; }
+  .role-banner.eng  { background: #EEF2FF; border: 1.5px solid #C5CAF5; }
+  .role-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .role-dot.mgmt { background: var(--red); }
+  .role-dot.eng  { background: var(--indigo); }
+  .role-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .role-label.mgmt { color: var(--red); }
+  .role-label.eng  { color: var(--indigo); }
+  .role-sub { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  .scene-loc {
+    font-size: 12px; color: var(--muted); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .body-p {
+    font-size: 14px; color: var(--ink); line-height: 1.95; margin-bottom: 14px;
+  }
+  .quote-wrap {
+    border-left: 4px solid var(--orange);
+    border-radius: 0 14px 14px 0;
+    padding: 16px 18px; margin: 16px 0; position: relative;
+  }
+  .quote-wrap::before {
+    content: '"'; position: absolute;
+    top: -6px; left: 14px; font-size: 44px; opacity: .2; line-height: 1;
+  }
+  .quote-wrap p { font-size: 13.5px; color: var(--ink); line-height: 1.85; font-style: italic; }
+  .quote-wrap .spk { font-size: 11px; color: var(--muted); margin-top: 8px; font-style: normal; font-weight: 600; }
+  .hl-blue { font-weight: 700; color: var(--blue); }
+  .hl-red  { font-weight: 700; color: var(--red); }
+
+  /* ====== CARD 2 · 管理层 ====== */
+  .card-mgmt {
+    background: var(--white);
+    padding: 36px 30px; min-height: 590px;
+  }
+  .quote-wrap.mgmt-q { background: #FFF8F0; }
+  .quote-wrap.mgmt-q::before { color: var(--orange); }
+  .compare-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;
+  }
+  .compare-box {
+    border-radius: 14px; padding: 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .compare-box.bad  { background: #FFF5F5; border: 1.5px dashed #FFCDD2; }
+  .compare-box.good { background: #F0F7FF; border: 1.5px solid #BBDEFB; }
+  .compare-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+  .compare-box.bad  .compare-label { color: var(--red); }
+  .compare-box.good .compare-label { color: var(--blue); }
+  .compare-text {
+    font-family: 'Courier New', monospace;
+    font-size: 12px; line-height: 1.7; color: var(--ink);
+  }
+  .compare-result { font-size: 11px; margin-top: 4px; }
+  .compare-box.bad  .compare-result { color: var(--red); }
+  .compare-box.good .compare-result { color: #1976D2; }
+
+  /* ====== CARD 3 · 工程师 ====== */
+  .card-eng {
+    background: var(--navy);
+    padding: 36px 30px; min-height: 560px;
+  }
+  .card-eng::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(61,90,254,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,90,254,.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .card-eng .body-p { color: rgba(255,255,255,.72); }
+  .card-eng .quote-wrap {
+    background: rgba(255,255,255,.05); border-left-color: var(--indigo);
+  }
+  .card-eng .quote-wrap::before { color: var(--indigo); }
+  .card-eng .quote-wrap p { color: rgba(255,255,255,.82); }
+  .card-eng .quote-wrap .spk { color: rgba(255,255,255,.35); }
+  .card-eng .scene-loc { color: rgba(255,255,255,.3); }
+  .code-diff {
+    background: rgba(0,0,0,.4);
+    border: 1px solid rgba(61,90,254,.3);
+    border-radius: 12px; padding: 16px;
+    margin: 14px 0; font-family: 'Courier New', monospace; font-size: 12px;
+  }
+  .code-diff .bad-line  { color: #FF6B8A; }
+  .code-diff .good-line { color: #69F0AE; }
+  .code-diff .label { font-size: 10px; letter-spacing: 2px; margin-bottom: 8px; color: rgba(255,255,255,.3); }
+
+  /* ====== CARD 4 · EXPLAIN ====== */
+  .card-explain {
+    background: var(--cream);
+    padding: 36px 30px; min-height: 620px;
+  }
+  .section-head {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700;
+    padding: 7px 16px; border-radius: 10px; margin-bottom: 22px;
+  }
+  .section-head.blue  { background: var(--blue);   color: #fff; }
+  .section-head.teal  { background: var(--teal);   color: #fff; }
+  .section-head.orange{ background: var(--orange); color: #fff; }
+  .section-head.dark  { background: var(--dark);   color: #fff; }
+  .section-head.red   { background: var(--red);    color: #fff; }
+
+  .analogy-flow {
+    display: flex; flex-direction: column; gap: 0; margin: 16px 0;
+  }
+  .flow-row {
+    display: flex; align-items: stretch; gap: 0;
+  }
+  .flow-label {
+    width: 88px; flex-shrink: 0;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    color: var(--muted); display: flex; align-items: center;
+    padding-right: 10px;
+  }
+  .flow-items {
+    flex: 1; display: flex; gap: 8px; padding: 8px 0;
+    border-left: 2px solid #E0E8F5; padding-left: 16px;
+    position: relative;
+  }
+  .flow-items::before {
+    content: ''; position: absolute; left: -6px; top: 50%;
+    transform: translateY(-50%);
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--blue);
+  }
+  .flow-chip {
+    background: var(--white); border: 1.5px solid #BBDEFB;
+    border-radius: 8px; padding: 8px 12px;
+    font-size: 13px; font-weight: 700; color: var(--ink);
+  }
+  .flow-chip.accent {
+    background: var(--blue); border-color: var(--blue);
+    color: #fff;
+  }
+  .flow-arrow {
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px 0 4px 104px; font-size: 18px; color: var(--blue); opacity: .5;
+  }
+
+  .workorder-box {
+    background: var(--white); border: 1.5px solid #BBDEFB;
+    border-radius: 16px; padding: 18px; margin: 14px 0;
+  }
+  .wo-title { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 12px; letter-spacing: 1px; }
+  .wo-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+  .wo-key { font-size: 12px; font-weight: 700; color: var(--muted); width: 52px; flex-shrink: 0; padding-top: 1px; }
+  .wo-val { font-size: 13px; color: var(--ink); line-height: 1.7; }
+  .wo-val b { color: var(--blue); }
+
+  /* ====== CARD 5 · SCENES ====== */
+  .card-scenes {
+    background: var(--white);
+    padding: 36px 30px; min-height: 660px;
+  }
+  .scene-block {
+    border-radius: 16px; padding: 18px; margin: 12px 0;
+    position: relative; overflow: hidden;
+  }
+  .scene-block::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  }
+  .scene-block.s1 { background: #FFF8F0; border: 1.5px solid #FFE0C0; }
+  .scene-block.s1::after { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+  .scene-block.s2 { background: #EEF2FF; border: 1.5px solid #C5CAF5; }
+  .scene-block.s2::after { background: linear-gradient(90deg, var(--indigo), var(--blue)); }
+  .scene-block.s3 { background: #E8F5E9; border: 1.5px solid #A5D6A7; }
+  .scene-block.s3::after { background: linear-gradient(90deg, #43A047, var(--teal)); }
+  .scene-role { font-size: 10px; font-weight: 700; letter-spacing: 2px; margin-bottom: 6px; }
+  .scene-role.mgmt { color: var(--red); }
+  .scene-role.eng  { color: var(--indigo); }
+  .scene-role.all  { color: #43A047; }
+  .scene-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .scene-body  { font-size: 13px; color: var(--muted); line-height: 1.85; }
+  .scene-body b { color: var(--ink); }
+  .prompt-example {
+    background: rgba(0,0,0,.04); border-radius: 8px;
+    padding: 10px 12px; margin: 10px 0;
+    font-family: 'Courier New', monospace; font-size: 12px; color: var(--ink);
+    line-height: 1.7; border-left: 3px solid var(--blue);
+  }
+  .tip-tag {
+    display: inline-block; background: #E8F5E9; color: #2E7D32;
+    font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-top: 10px;
+  }
+
+  /* ====== CARD 6 · 黄金公式 ====== */
+  .card-formula {
+    background: linear-gradient(155deg, #0A1628 0%, #0D2144 100%);
+    padding: 36px 30px; min-height: 520px;
+  }
+  .formula-title { font-size: 13px; color: rgba(255,255,255,.3); letter-spacing: 3px; margin-bottom: 20px; }
+  .formula-box {
+    background: rgba(26,115,232,.12); border: 1px solid rgba(26,115,232,.35);
+    border-radius: 18px; padding: 22px; margin-bottom: 20px;
+    text-align: center;
+  }
+  .formula-eq {
+    font-size: 17px; font-weight: 700; color: #fff;
+    line-height: 1.9; letter-spacing: 1px;
+  }
+  .formula-eq .f-part {
+    display: inline-block;
+    background: rgba(26,115,232,.25); border: 1px solid rgba(26,115,232,.4);
+    border-radius: 8px; padding: 4px 12px; margin: 3px;
+    font-size: 15px; color: #90CAF9;
+  }
+  .formula-eq .f-plus { color: rgba(255,255,255,.4); margin: 0 4px; }
+  .formula-eq .f-eq { color: var(--yellow); margin: 0 8px; font-size: 20px; }
+  .formula-eq .f-result {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(26,115,232,.3), rgba(61,90,254,.3));
+    border: 1px solid rgba(26,115,232,.5);
+    border-radius: 10px; padding: 6px 16px;
+    color: #fff; font-size: 16px; margin-left: 4px;
+  }
+
+  .mistake-box {
+    background: rgba(232,0,61,.1); border: 1px solid rgba(232,0,61,.25);
+    border-radius: 16px; padding: 16px; margin: 12px 0;
+  }
+  .mistake-box h4 { font-size: 13px; font-weight: 700; color: #FF6B8A; margin-bottom: 8px; }
+  .mistake-box p  { font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.8; }
+  .tips-box {
+    background: rgba(0,180,166,.1); border: 1px solid rgba(0,180,166,.25);
+    border-radius: 16px; padding: 16px; margin: 12px 0;
+  }
+  .tips-box h4 { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 8px; }
+  .tip-item {
+    font-size: 13px; color: rgba(255,255,255,.65);
+    padding: 5px 0; display: flex; gap: 10px; line-height: 1.7;
+  }
+  .tip-item::before { content: '→'; color: var(--yellow); font-weight: 700; flex-shrink: 0; }
+
+  /* ====== CARD 7 · CLOSE ====== */
+  .card-close {
+    background: var(--white); padding: 36px 30px;
+    min-height: 460px; display: flex; flex-direction: column; gap: 18px;
+  }
+  .summary-card {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--indigo) 100%);
+    border-radius: 18px; padding: 24px;
+  }
+  .summary-card p { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.75; }
+  .interact-card {
+    background: var(--cream); border: 1.5px solid #BBDEFB;
+    border-radius: 18px; padding: 20px;
+  }
+  .interact-card h4 { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 10px; }
+  .interact-card p  { font-size: 13px; color: var(--muted); line-height: 1.85; }
+  .interact-card b  { color: var(--ink); }
+  .preview-row {
+    background: var(--dark); border-radius: 14px;
+    padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px;
+  }
+  .blink { width: 8px; height: 8px; background: var(--yellow); border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px; animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+  .preview-text { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.7; }
+  .preview-text b { color: #fff; }
+  .close-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--blue), var(--indigo), var(--teal)); }
+
+  /* Nav dots */
+  .nav-dots { display: flex; gap: 6px; justify-content: center; }
+  .nd { width: 6px; height: 6px; border-radius: 50%; background: #BCC8D8; }
+  .nd.on { background: var(--blue); width: 20px; border-radius: 3px; }
+  .page-label { font-size: 11px; color: #8899AA; letter-spacing: 1px; text-align: center; }
+</style>
+</head>
+<body>
+
+<p class="page-label">📱 小红书图文 · 共7张 · 手机制造厂版 · Day 02</p>
+
+<!-- ══ CARD 1 · COVER ══ -->
+<div class="card card-cover">
+  <div class="cover-series">
+    <span class="cover-pill">30天AI科普营</span>
+    <span class="cover-pill-outline">Day 02</span>
+  </div>
+  <div class="cover-code-bg">
+    你是一名品质工程师<br>
+    分析以下AOI缺陷数据<br>
+    输出今日品质日报<br>
+    格式：问题 / 数量 / 建议<br>
+    ···
+  </div>
+  <div class="cover-day">DAY 02 · 基础概念</div>
+  <div class="cover-word">Pro<em>mpt</em></div>
+  <div class="cover-en">// THE INSTRUCTION TO AI</div>
+  <div class="cover-tagline">
+    同样让AI写品质报告——<br>
+    为什么有人3秒出结果，<br>
+    有人来回改了10次？
+  </div>
+  <div class="cover-audience">
+    <span class="audience-tag">👔 管理层</span>
+    <span class="audience-tag">🔧 工程师</span>
+    <span class="audience-tag">📋 品质/IE</span>
+  </div>
+  <div class="cover-bar"></div>
+</div>
+
+<!-- ══ CARD 2 · 管理层视角 ══ -->
+<div class="card card-mgmt">
+  <div class="role-banner mgmt">
+    <div class="role-dot mgmt"></div>
+    <span class="role-label mgmt">管理层视角</span>
+    <span class="role-sub">生产总监 / 品质主管</span>
+  </div>
+
+  <div class="scene-loc">📍 会议室 · 周一早会复盘</div>
+
+  <p class="body-p">上周五，品质部张主管让两个工程师各自用AI写当天的品质日报。两人同样用的AI工具，同样的原始数据，但结果完全不同：</p>
+
+  <div class="compare-row">
+    <div class="compare-box bad">
+      <span class="compare-label">❌ 小李的指令</span>
+      <div class="compare-text">帮我写品质报告</div>
+      <div class="compare-result">AI：输出了3段废话，没有数据，没有格式，删了重来</div>
+    </div>
+    <div class="compare-box good">
+      <span class="compare-label">✅ 小王的指令</span>
+      <div class="compare-text">你是品质工程师，分析今日AOI缺陷数据[粘贴数据]，按「问题/数量/改善建议」输出日报，100字以内</div>
+      <div class="compare-result">AI：30秒输出完整日报，直接使用</div>
+    </div>
+  </div>
+
+  <p class="body-p">张主管盯着两份结果，问了一个关键问题：<span class="hl-blue">「同样的AI，为什么差这么多？」</span></p>
+  <p class="body-p">答案只有两个字——<span class="hl-red">Prompt。</span></p>
+</div>
+
+<!-- ══ CARD 3 · 工程师视角 ══ -->
+<div class="card card-eng">
+  <div class="role-banner eng" style="background:rgba(61,90,254,.12); border-color:rgba(61,90,254,.3);">
+    <div class="role-dot eng"></div>
+    <span class="role-label eng">工程师视角</span>
+    <span class="role-sub" style="color:rgba(255,255,255,.3);">QE / PE / SMT工程师</span>
+  </div>
+
+  <div class="scene-loc">📍 工程部 · 用AI分析SMT锡膏印刷偏移问题</div>
+
+  <p class="body-p">上周QE工程师小陈要用AI分析本月SMT锡膏印刷偏移趋势，第一次是这样输入的：</p>
+
+  <div class="code-diff">
+    <div class="label">❌ 第一次 Prompt（太模糊）</div>
+    <div class="bad-line">分析一下我们的锡膏印刷数据</div>
+  </div>
+
+  <p class="body-p" style="color:rgba(255,255,255,.7);">AI回了一篇讲锡膏印刷原理的文章——完全没用。小陈改了5次，越改越乱。</p>
+  <p class="body-p" style="color:rgba(255,255,255,.7);">后来他把Prompt改成了这样：</p>
+
+  <div class="code-diff">
+    <div class="label">✅ 修改后 Prompt（像工单一样精确）</div>
+    <div class="good-line">角色：你是SMT制程工程师</div>
+    <div class="good-line">任务：分析本月B线锡膏印刷偏移数据</div>
+    <div class="good-line">数据：[粘贴表格]</div>
+    <div class="good-line">输出：Top3异常原因 + 改善建议</div>
+  </div>
+
+  <p class="body-p" style="color:rgba(255,255,255,.7);">这次AI直接输出了他想要的分析结果，<span style="color:#90CAF9;font-weight:700;">一次成功。</span></p>
+</div>
+
+<!-- ══ CARD 4 · EXPLAIN ══ -->
+<div class="card card-explain">
+  <div class="section-head dark">🏭 用工单逻辑，理解Prompt</div>
+
+  <p class="body-p">咱们手机厂最熟悉的就是工单。工单写得越清楚，工人干活越准；工单写得含糊，出来的东西就含糊。</p>
+  <p class="body-p"><strong>Prompt（提示词）就是你给AI下的工单。</strong></p>
+
+  <div class="analogy-flow">
+    <div class="flow-row">
+      <div class="flow-label">工厂工单</div>
+      <div class="flow-items">
+        <div class="flow-chip">工序要求</div>
+        <div class="flow-chip">物料规格</div>
+        <div class="flow-chip">质量标准</div>
+        <div class="flow-chip">交期</div>
+      </div>
+    </div>
+    <div class="flow-arrow">↕</div>
+    <div class="flow-row">
+      <div class="flow-label">AI的Prompt</div>
+      <div class="flow-items">
+        <div class="flow-chip accent">角色</div>
+        <div class="flow-chip accent">任务</div>
+        <div class="flow-chip accent">背景</div>
+        <div class="flow-chip accent">格式</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="workorder-box">
+    <div class="wo-title">📋 好Prompt的4要素（工单化写法）</div>
+    <div class="wo-row">
+      <div class="wo-key">角色</div>
+      <div class="wo-val">告诉AI它是谁：<b>「你是一名SMT制程工程师」</b></div>
+    </div>
+    <div class="wo-row">
+      <div class="wo-key">任务</div>
+      <div class="wo-val">说清楚要做什么：<b>「分析本月B线锡膏偏移数据」</b></div>
+    </div>
+    <div class="wo-row">
+      <div class="wo-key">背景</div>
+      <div class="wo-val">提供必要信息：<b>「[粘贴数据或说明背景]」</b></div>
+    </div>
+    <div class="wo-row" style="margin-bottom:0">
+      <div class="wo-key">格式</div>
+      <div class="wo-val">限定输出样式：<b>「按Top3原因+建议输出，100字以内」</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARD 5 · SCENES ══ -->
+<div class="card card-scenes">
+  <div class="section-head orange">🏭 手机厂3个Prompt实战模板</div>
+
+  <div class="scene-block s1">
+    <div class="scene-role mgmt">👔 管理层 · 日常决策</div>
+    <div class="scene-title">📊 让AI写每日生产日报</div>
+    <div class="scene-body">
+      <b>❌ 错误写法：</b>「帮我写今天的生产日报」<br>
+      <b>✅ 正确写法：</b>
+    </div>
+    <div class="prompt-example">
+      你是生产文员，根据以下数据[数据]，<br>
+      生成今日生产日报，包含：产量/良率/<br>
+      异常事项/明日预排，格式简洁，200字内
+    </div>
+    <span class="tip-tag">💡 加上格式要求，输出直接可用</span>
+  </div>
+
+  <div class="scene-block s2">
+    <div class="scene-role eng">🔧 工程师 · 制程分析</div>
+    <div class="scene-title">🔍 让AI分析AOI缺陷趋势</div>
+    <div class="scene-body">
+      <b>❌ 错误写法：</b>「分析一下这个缺陷数据」<br>
+      <b>✅ 正确写法：</b>
+    </div>
+    <div class="prompt-example">
+      你是QE工程师，分析[本周AOI缺陷表格]，<br>
+      找出Top3缺陷类型、趋势原因，<br>
+      给出改善建议，结果用表格输出
+    </div>
+    <span class="tip-tag">💡 指定输出「表格」，方便直接汇报</span>
+  </div>
+
+  <div class="scene-block s3">
+    <div class="scene-role all">📋 品质/IE · 文件整理</div>
+    <div class="scene-title">📝 让AI翻译/整理英文技术文件</div>
+    <div class="scene-body">
+      <b>❌ 错误写法：</b>「翻译这个」<br>
+      <b>✅ 正确写法：</b>
+    </div>
+    <div class="prompt-example">
+      将以下设备英文报错说明[内容]翻译成<br>
+      中文，保留专业术语，用工厂维修人员<br>
+      能看懂的语言，输出：原文/译文/建议操作
+    </div>
+    <span class="tip-tag">💡 指定读者是「维修人员」，AI语言更接地气</span>
+  </div>
+</div>
+
+<!-- ══ CARD 6 · 黄金公式+误区 ══ -->
+<div class="card card-formula">
+  <div class="formula-title">// PROMPT FORMULA · 黄金公式</div>
+
+  <div class="formula-box">
+    <div class="formula-eq">
+      <span class="f-part">角色</span>
+      <span class="f-plus">+</span>
+      <span class="f-part">任务</span>
+      <span class="f-plus">+</span>
+      <span class="f-part">背景</span>
+      <span class="f-plus">+</span>
+      <span class="f-part">格式</span>
+      <span class="f-eq">=</span>
+      <span class="f-result">好结果 ✦</span>
+    </div>
+    <div style="font-size:12px; color:rgba(255,255,255,.4); margin-top:12px; letter-spacing:1px;">
+      就像工单写清楚了，工人才能做出你要的东西
+    </div>
+  </div>
+
+  <div class="mistake-box">
+    <h4>❌ 最常见误区：Prompt越长越好？</h4>
+    <p>很多人把所有背景资料一股脑粘进去——这不是好Prompt，这是在给AI制造噪音。<br>
+    好Prompt的核心是<b style="color:#FF6B8A;">精准</b>，不是冗长。</p>
+  </div>
+
+  <div class="tips-box">
+    <h4>✅ 写好Prompt的3个习惯</h4>
+    <div class="tip-item">第一句话先定角色，AI的「身份感」会让输出质量提升30%</div>
+    <div class="tip-item">明确说「用表格/用列表/用100字」，省掉反复调格式的时间</div>
+    <div class="tip-item">结果不满意不要删掉重来，在原Prompt后加「请在上面基础上修改：…」</div>
+  </div>
+</div>
+
+<!-- ══ CARD 7 · CLOSE ══ -->
+<div class="card card-close">
+  <div class="section-head blue">💡 一句话总结</div>
+
+  <div class="summary-card">
+    <p>Prompt 就是你给AI下的工单。<br><br>
+    工单写得清楚，AI出的活就好；<br>
+    工单含糊，来回改10次也白搭。<br><br>
+    <b>记住4要素：角色 + 任务 + 背景 + 格式</b></p>
+  </div>
+
+  <div class="interact-card">
+    <h4>💬 今天的互动问题</h4>
+    <p>你平时用AI最头疼的是什么——<br>
+    是<b>「AI回答驴唇不对马嘴」</b>，还是<b>「每次都要改好几遍」</b>？<br><br>
+    评论区说说你的场景，我帮你把Prompt改好 👇</p>
+  </div>
+
+  <div class="preview-row">
+    <div class="blink"></div>
+    <div class="preview-text">
+      明天预告：<b>大模型</b><br>
+      供应商说「我们大模型什么都能做」——大模型到底比小模型大在哪？我们工厂该选多大的？
+    </div>
+  </div>
+
+  <div class="close-bar"></div>
+</div>
+
+<div class="nav-dots">
+  <div class="nd"></div>
+  <div class="nd on"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+</div>
+
+<p class="page-label" style="margin-bottom:24px;">📚 30天AI术语科普营 · 手机制造厂内部科普版 · Day 02</p>
+
+</body>
+</html>
