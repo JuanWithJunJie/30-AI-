@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI术语科普营 · Day 04 · 上下文窗口 · 手机制造厂版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --purple:   #7C3AED;
+    --violet:   #A855F7;
+    --lavender: #C4B5FD;
+    --pink:     #EC4899;
+    --gold:     #FFD166;
+    --red:      #E8003D;
+    --orange:   #FF6B35;
+    --dark:     #0F0A1E;
+    --deep:     #160D2E;
+    --ink:      #1E1433;
+    --muted:    #7C6E8A;
+    --cream:    #F8F4FF;
+    --white:    #FFFFFF;
+    --card-w:   390px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #E2DCF0;
+    font-family: 'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    gap:20px; padding:40px 20px;
+  }
+  .card {
+    width:var(--card-w); border-radius:20px; overflow:hidden;
+    box-shadow:0 6px 32px rgba(0,0,0,.15); position:relative;
+  }
+
+  /* ══ CARD 1 · COVER ══ */
+  .card-cover {
+    background: var(--dark); min-height:540px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:40px 34px;
+  }
+  .card-cover::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 78% 8%,  #7C3AED45 0%, transparent 52%),
+      radial-gradient(ellipse at 12% 82%, #A855F720 0%, transparent 50%);
+  }
+  .card-cover::after {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(124,58,237,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,.06) 1px, transparent 1px);
+    background-size:32px 32px;
+  }
+
+  /* window / memory bar decoration */
+  .cover-window-deco {
+    position:absolute; top:52px; right:28px; z-index:2;
+    display:flex; flex-direction:column; gap:6px; width:110px;
+  }
+  .win-bar { height:14px; border-radius:20px; position:relative; overflow:hidden; }
+  .win-bar-inner { height:100%; border-radius:20px; }
+  .win-bar-bg { background:rgba(255,255,255,.07); }
+  .wb-full  .win-bar-inner { width:100%; background:linear-gradient(90deg,#7C3AED,#A855F7); box-shadow:0 0 8px rgba(168,85,247,.5); }
+  .wb-75  .win-bar-inner  { width:75%;  background:linear-gradient(90deg,#7C3AED,#C084FC); }
+  .wb-40  .win-bar-inner  { width:40%;  background:rgba(124,58,237,.5); }
+  .wb-10  .win-bar-inner  { width:10%;  background:rgba(124,58,237,.3); }
+  .win-label { font-size:9px; color:rgba(255,255,255,.28); letter-spacing:1px; margin-top:2px; font-family:'Courier New',monospace; }
+  .win-overflow-tag {
+    background:rgba(232,0,61,.2); border:1px solid rgba(232,0,61,.4);
+    border-radius:6px; padding:4px 8px; font-size:9px; color:#FF6B8A;
+    font-weight:700; letter-spacing:1px; font-family:'Courier New',monospace;
+    margin-top:4px; display:inline-block;
+  }
+
+  .cover-series { position:absolute; top:28px; left:34px; display:flex; gap:8px; align-items:center; z-index:2; }
+  .cover-pill   { background:var(--purple); color:#fff; font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; letter-spacing:1px; }
+  .cover-pill-o { border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.5); font-size:11px; padding:5px 12px; border-radius:20px; }
+  .cover-day    { font-size:11px; color:rgba(255,255,255,.32); letter-spacing:4px; margin-bottom:10px; position:relative; z-index:2; }
+  .cover-word   { font-size:54px; font-weight:900; color:#fff; line-height:.95; letter-spacing:0; position:relative; z-index:2; }
+  .cover-word em { font-style:normal; color:var(--lavender); text-shadow:0 0 40px rgba(196,181,253,.5); }
+  .cover-sub    { font-size:12px; color:rgba(255,255,255,.25); letter-spacing:3px; margin-top:6px; position:relative; z-index:2; font-family:'Courier New',monospace; }
+  .cover-tagline { font-size:14px; color:rgba(255,255,255,.62); margin-top:18px; line-height:1.75; border-left:3px solid var(--violet); padding-left:14px; position:relative; z-index:2; }
+  .cover-audience { position:absolute; bottom:52px; right:34px; display:flex; flex-direction:column; gap:5px; z-index:2; align-items:flex-end; }
+  .aud-tag { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); color:rgba(255,255,255,.5); font-size:10px; padding:3px 10px; border-radius:10px; }
+  .cover-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--purple),var(--violet),var(--pink)); }
+
+  /* ══ SHARED ══ */
+  .role-banner { display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:12px; margin-bottom:20px; }
+  .role-banner.mgmt { background:#FFF0F3; border:1.5px solid #FFCCD5; }
+  .role-banner.eng  { background:#F5F0FF; border:1.5px solid #DDD6FE; }
+  .role-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .role-dot.mgmt { background:var(--red); }
+  .role-dot.eng  { background:var(--purple); }
+  .role-label { font-size:12px; font-weight:700; letter-spacing:1px; }
+  .role-label.mgmt { color:var(--red); }
+  .role-label.eng  { color:var(--purple); }
+  .role-sub { font-size:11px; color:var(--muted); margin-left:auto; }
+  .scene-loc { font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .body-p { font-size:14px; color:var(--ink); line-height:1.95; margin-bottom:14px; }
+  .quote-wrap { border-left:4px solid var(--orange); border-radius:0 14px 14px 0; padding:16px 18px; margin:16px 0; position:relative; }
+  .quote-wrap::before { content:'"'; position:absolute; top:-6px; left:14px; font-size:44px; opacity:.2; line-height:1; color:var(--orange); }
+  .quote-wrap p { font-size:13.5px; color:var(--ink); line-height:1.85; font-style:italic; }
+  .quote-wrap .spk { font-size:11px; color:var(--muted); margin-top:8px; font-style:normal; font-weight:600; }
+  .hl-purple { font-weight:700; color:var(--purple); }
+  .hl-red    { font-weight:700; color:var(--red); }
+  .hl-gold   { font-weight:700; color:#B45309; }
+
+  /* ══ CARD 2 · 管理层 ══ */
+  .card-mgmt { background:var(--white); padding:36px 30px; min-height:580px; }
+  .quote-wrap.mgmt-q { background:#FFFBF0; }
+
+  /* degradation visual */
+  .degrade-visual {
+    background:var(--cream); border:1.5px solid #DDD6FE;
+    border-radius:16px; padding:18px; margin:16px 0;
+  }
+  .dv-title { font-size:12px; font-weight:700; color:var(--purple); letter-spacing:1px; margin-bottom:12px; }
+  .dv-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .dv-label { font-size:11px; color:var(--muted); width:72px; flex-shrink:0; line-height:1.4; }
+  .dv-bar-wrap { flex:1; height:20px; background:rgba(0,0,0,.05); border-radius:10px; overflow:hidden; }
+  .dv-bar { height:100%; border-radius:10px; display:flex; align-items:center; padding:0 8px; }
+  .dv-bar span { font-size:10px; font-weight:700; color:#fff; white-space:nowrap; }
+  .dv-100 .dv-bar { width:95%; background:linear-gradient(90deg,#7C3AED,#A855F7); }
+  .dv-70  .dv-bar { width:65%; background:linear-gradient(90deg,#9333EA,#C084FC); opacity:.85; }
+  .dv-40  .dv-bar { width:38%; background:linear-gradient(90deg,#A855F7,#DDD6FE); color:var(--purple);}
+  .dv-40  .dv-bar span { color:var(--purple); }
+  .dv-over .dv-bar-wrap { background:rgba(232,0,61,.1); border:1px dashed rgba(232,0,61,.4); }
+  .dv-over .dv-bar { width:100%; background:rgba(232,0,61,.25); }
+  .dv-over .dv-bar span { color:#E8003D; }
+
+  /* ══ CARD 3 · 工程师 ══ */
+  .card-eng { background:var(--deep); padding:36px 30px; min-height:570px; }
+  .card-eng::before {
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(124,58,237,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.06) 1px,transparent 1px);
+    background-size:28px 28px;
+  }
+  .card-eng .body-p { color:rgba(255,255,255,.72); }
+  .card-eng .scene-loc { color:rgba(255,255,255,.3); }
+  .card-eng .quote-wrap { background:rgba(255,255,255,.05); border-left-color:var(--violet); }
+  .card-eng .quote-wrap::before { color:var(--violet); }
+  .card-eng .quote-wrap p { color:rgba(255,255,255,.82); }
+  .card-eng .quote-wrap .spk { color:rgba(255,255,255,.32); }
+
+  .error-box {
+    background:rgba(0,0,0,.5); border:1px solid rgba(232,0,61,.4);
+    border-radius:12px; padding:16px; margin:12px 0;
+    font-family:'Courier New',monospace; font-size:12px; line-height:1.8;
+  }
+  .err-line1 { color:#FF6B8A; }
+  .err-line2 { color:#FFA07A; }
+  .err-line3 { color:rgba(255,255,255,.4); }
+
+  .fix-box {
+    background:rgba(124,58,237,.12); border:1px solid rgba(168,85,247,.3);
+    border-radius:12px; padding:16px; margin:12px 0;
+  }
+  .fix-title { font-size:12px; font-weight:700; color:var(--lavender); letter-spacing:1px; margin-bottom:10px; }
+  .fix-step { display:flex; gap:10px; align-items:flex-start; margin-bottom:8px; }
+  .fix-step:last-child { margin-bottom:0; }
+  .fix-num { width:20px; height:20px; border-radius:50%; background:var(--purple); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .fix-text { font-size:13px; color:rgba(255,255,255,.72); line-height:1.7; }
+  .fix-text b { color:rgba(255,255,255,.95); }
+
+  /* ══ CARD 4 · EXPLAIN ══ */
+  .card-explain { background:var(--cream); padding:36px 30px; min-height:650px; }
+  .section-head { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:7px 16px; border-radius:10px; margin-bottom:22px; }
+  .section-head.purple { background:var(--purple); color:#fff; }
+  .section-head.dark   { background:var(--dark);   color:#fff; }
+  .section-head.orange { background:var(--orange); color:#fff; }
+  .section-head.red    { background:var(--red);    color:#fff; }
+  .section-head.gold   { background:var(--gold);   color:var(--ink); }
+
+  /* whiteboard analogy */
+  .whiteboard {
+    background:var(--white); border:2px solid #DDD6FE;
+    border-radius:16px; padding:20px; margin:14px 0; position:relative;
+  }
+  .wb-title { font-size:11px; font-weight:700; color:var(--purple); letter-spacing:2px; margin-bottom:14px; }
+  .wb-content { display:flex; flex-direction:column; gap:8px; }
+  .wb-item { display:flex; gap:8px; align-items:center; }
+  .wb-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .wb-item-text { font-size:13px; color:var(--ink); line-height:1.6; }
+  .wb-divider { border:none; border-top:1px dashed #DDD6FE; margin:8px 0; }
+  .wb-full-badge {
+    position:absolute; top:-10px; right:16px;
+    background:var(--purple); color:#fff;
+    font-size:10px; font-weight:700; padding:4px 10px; border-radius:10px; letter-spacing:1px;
+  }
+
+  /* capacity meter */
+  .capacity-meter { margin:16px 0; }
+  .cm-label { font-size:12px; color:var(--muted); margin-bottom:6px; display:flex; justify-content:space-between; }
+  .cm-bar-bg { height:28px; background:rgba(0,0,0,.06); border-radius:10px; overflow:hidden; position:relative; }
+  .cm-bar-fill { height:100%; border-radius:10px; display:flex; align-items:center; justify-content:flex-end; padding-right:10px; }
+  .cm-bar-fill span { font-size:11px; font-weight:700; color:#fff; }
+  .cm-small  .cm-bar-fill { width:18%; background:rgba(124,58,237,.5); justify-content:center; }
+  .cm-medium .cm-bar-fill { width:48%; background:linear-gradient(90deg,#7C3AED,#A855F7); }
+  .cm-large  .cm-bar-fill { width:88%; background:linear-gradient(90deg,#7C3AED,#EC4899); box-shadow:0 0 10px rgba(168,85,247,.4); }
+
+  .info-box { background:var(--white); border:1.5px solid #DDD6FE; border-radius:14px; padding:16px; margin:12px 0; }
+  .info-box p { font-size:13px; color:var(--ink); line-height:1.85; }
+  .info-box b { color:var(--purple); }
+
+  /* ══ CARD 5 · 实战 ══ */
+  .card-scenes { background:var(--white); padding:36px 30px; min-height:680px; }
+  .scene-block { border-radius:16px; padding:18px; margin:12px 0; position:relative; overflow:hidden; }
+  .scene-block::after { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+  .scene-block.s1 { background:#FFF8F0; border:1.5px solid #FFE0C0; }
+  .scene-block.s1::after { background:linear-gradient(90deg,var(--orange),var(--gold)); }
+  .scene-block.s2 { background:#F5F0FF; border:1.5px solid #DDD6FE; }
+  .scene-block.s2::after { background:linear-gradient(90deg,var(--purple),var(--violet)); }
+  .scene-block.s3 { background:#FFF0F6; border:1.5px solid #FBCFE8; }
+  .scene-block.s3::after { background:linear-gradient(90deg,var(--pink),var(--violet)); }
+  .scene-role { font-size:10px; font-weight:700; letter-spacing:2px; margin-bottom:6px; }
+  .scene-role.mgmt { color:var(--red); }
+  .scene-role.eng  { color:var(--purple); }
+  .scene-role.all  { color:var(--pink); }
+  .scene-title { font-size:15px; font-weight:700; color:var(--ink); margin-bottom:8px; }
+  .scene-body  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .scene-body b { color:var(--ink); }
+  .method-box {
+    background:rgba(0,0,0,.04); border-radius:10px;
+    padding:10px 12px; margin:10px 0;
+    font-size:12.5px; color:var(--ink); line-height:1.8;
+    border-left:3px solid var(--purple);
+  }
+  .method-box b { color:var(--purple); }
+  .tip-tag { display:inline-block; background:#EDE9FE; color:#5B21B6; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; margin-top:10px; }
+
+  /* ══ CARD 6 · 误区 ══ */
+  .card-mistakes { background:linear-gradient(155deg,var(--dark) 0%,var(--deep) 100%); padding:36px 30px; min-height:520px; }
+  .mistake-box { background:rgba(232,0,61,.1); border:1px solid rgba(232,0,61,.25); border-radius:16px; padding:16px; margin:12px 0; }
+  .mistake-box h4 { font-size:13px; font-weight:700; color:#FF6B8A; margin-bottom:8px; }
+  .mistake-box p  { font-size:13px; color:rgba(255,255,255,.65); line-height:1.8; }
+  .tips-box { background:rgba(124,58,237,.12); border:1px solid rgba(168,85,247,.3); border-radius:16px; padding:16px; margin:12px 0; }
+  .tips-box h4 { font-size:13px; font-weight:700; color:var(--lavender); margin-bottom:8px; }
+  .tip-item { font-size:13px; color:rgba(255,255,255,.65); padding:5px 0; display:flex; gap:10px; line-height:1.7; }
+  .tip-item::before { content:'→'; color:var(--gold); font-weight:700; flex-shrink:0; }
+
+  /* context size reference table */
+  .ctx-table { width:100%; border-collapse:collapse; margin:14px 0; border-radius:10px; overflow:hidden; }
+  .ctx-table th { background:var(--purple); color:#fff; font-size:12px; font-weight:700; padding:9px 12px; text-align:left; }
+  .ctx-table td { padding:8px 12px; font-size:12px; border-bottom:1px solid rgba(255,255,255,.06); }
+  .ctx-table tr:last-child td { border-bottom:none; }
+  .ctx-table td.name  { color:rgba(255,255,255,.8); }
+  .ctx-table td.size  { color:var(--lavender); font-weight:700; font-family:'Courier New',monospace; }
+  .ctx-table td.note  { color:rgba(255,255,255,.4); font-size:11px; }
+
+  /* ══ CARD 7 · CLOSE ══ */
+  .card-close { background:var(--white); padding:36px 30px; min-height:460px; display:flex; flex-direction:column; gap:18px; }
+  .summary-card { background:linear-gradient(135deg,var(--purple) 0%,var(--pink) 100%); border-radius:18px; padding:24px; }
+  .summary-card p { font-size:15px; font-weight:700; color:#fff; line-height:1.75; }
+  .interact-card { background:var(--cream); border:1.5px solid #DDD6FE; border-radius:18px; padding:20px; }
+  .interact-card h4 { font-size:13px; font-weight:700; color:var(--purple); margin-bottom:10px; }
+  .interact-card p  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .interact-card b  { color:var(--ink); }
+  .preview-row { background:var(--dark); border-radius:14px; padding:14px 18px; display:flex; align-items:flex-start; gap:12px; }
+  .blink { width:8px; height:8px; background:var(--lavender); border-radius:50%; flex-shrink:0; margin-top:4px; animation:blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+  .preview-text { font-size:13px; color:rgba(255,255,255,.5); line-height:1.7; }
+  .preview-text b { color:#fff; }
+  .close-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--purple),var(--violet),var(--pink)); }
+
+  .nav-dots { display:flex; gap:6px; justify-content:center; }
+  .nd { width:6px; height:6px; border-radius:50%; background:#C4B8D8; }
+  .nd.on { background:var(--purple); width:20px; border-radius:3px; }
+  .page-label { font-size:11px; color:#8878AA; letter-spacing:1px; text-align:center; }
+</style>
+</head>
+<body>
+
+<p class="page-label">📱 小红书图文 · 共7张 · 手机制造厂版 · Day 04</p>
+
+<!-- ══ CARD 1 · COVER ══ -->
+<div class="card card-cover">
+  <div class="cover-series">
+    <span class="cover-pill">30天AI科普营</span>
+    <span class="cover-pill-o">Day 04</span>
+  </div>
+
+  <!-- window fill decoration -->
+  <div class="cover-window-deco">
+    <div class="win-label">CONTEXT WINDOW</div>
+    <div class="win-bar win-bar-bg wb-full"><div class="win-bar-inner"></div></div>
+    <div class="win-bar win-bar-bg wb-75"><div class="win-bar-inner"></div></div>
+    <div class="win-bar win-bar-bg wb-40"><div class="win-bar-inner"></div></div>
+    <div class="win-bar win-bar-bg wb-10"><div class="win-bar-inner"></div></div>
+    <div class="win-overflow-tag">❌ OVERFLOW</div>
+  </div>
+
+  <div class="cover-day">DAY 04 · 基础概念</div>
+  <div class="cover-word"><em>上下文</em><br>窗口</div>
+  <div class="cover-sub">// CONTEXT WINDOW</div>
+  <div class="cover-tagline">
+    工程师把100份ECN文件<br>
+    一次丢进AI——报错了。<br>
+    这个坑，90%的人都踩过。
+  </div>
+  <div class="cover-audience">
+    <span class="aud-tag">👔 管理层</span>
+    <span class="aud-tag">🔧 工程师</span>
+    <span class="aud-tag">📋 品质/IE</span>
+  </div>
+  <div class="cover-bar"></div>
+</div>
+
+<!-- ══ CARD 2 · 管理层视角 ══ -->
+<div class="card card-mgmt">
+  <div class="role-banner mgmt">
+    <div class="role-dot mgmt"></div>
+    <span class="role-label mgmt">管理层视角</span>
+    <span class="role-sub">生产总监 / 项目经理</span>
+  </div>
+
+  <div class="scene-loc">📍 项目推进会 · AI知识库验收评审</div>
+
+  <p class="body-p">上个月，项目经理老陈在验收AI知识库系统时，发现了一个奇怪的现象——</p>
+  <p class="body-p">让AI总结一份20页的设备手册，回答得很准。但让它总结整套100页的设备手册，答案开始出错，越问越离谱。</p>
+
+  <div class="quote-wrap mgmt-q">
+    <p>这AI是不是有问题？同样的文件，短的能读，长的读完就乱答——我们花钱买的系统，不会白买了吧？</p>
+    <div class="spk">— 项目经理 老陈</div>
+  </div>
+
+  <p class="body-p">供应商解释说：<span class="hl-purple">「您的文件超过了模型的上下文窗口限制。」</span></p>
+  <p class="body-p">老陈听完一脸懵：<span class="hl-red">「什么窗口？AI还有窗口大小？」</span></p>
+
+  <p class="body-p">用这张图来理解AI回答质量随文件长度的变化：</p>
+
+  <div class="degrade-visual">
+    <div class="dv-title">// 文件长度 vs AI回答质量</div>
+    <div class="dv-row">
+      <div class="dv-label">20页手册</div>
+      <div class="dv-bar-wrap dv-100"><div class="dv-bar"><span>✅ 回答准确，一次通过</span></div></div>
+    </div>
+    <div class="dv-row">
+      <div class="dv-label">50页手册</div>
+      <div class="dv-bar-wrap dv-70"><div class="dv-bar"><span>⚠️ 部分细节遗漏</span></div></div>
+    </div>
+    <div class="dv-row">
+      <div class="dv-label">80页手册</div>
+      <div class="dv-bar-wrap dv-40"><div class="dv-bar"><span>⚠️ 回答明显变差</span></div></div>
+    </div>
+    <div class="dv-row">
+      <div class="dv-label">100页手册</div>
+      <div class="dv-bar-wrap dv-over"><div class="dv-bar"><span>❌ 超限报错 / 乱答</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARD 3 · 工程师视角 ══ -->
+<div class="card card-eng">
+  <div class="role-banner eng" style="background:rgba(124,58,237,.12);border-color:rgba(168,85,247,.3);">
+    <div class="role-dot eng"></div>
+    <span class="role-label eng">工程师视角</span>
+    <span class="role-sub" style="color:rgba(255,255,255,.3);">PE工程师 / QE工程师</span>
+  </div>
+
+  <div class="scene-loc">📍 工程部 · PE工程师处理ECN变更文件</div>
+
+  <p class="body-p">上周，PE工程师小王要用AI汇总本季度全部ECN变更记录，把100份文件打包一次性丢进AI，结果直接报错：</p>
+
+  <div class="error-box">
+    <div class="err-line1">Error: Context length exceeded</div>
+    <div class="err-line2">Your input: 128,000 tokens</div>
+    <div class="err-line2">Model limit: 100,000 tokens</div>
+    <div class="err-line3">→ Please reduce your input size</div>
+  </div>
+
+  <p class="body-p" style="color:rgba(255,255,255,.7);">小王当时一脸懵：<span style="color:var(--lavender);font-weight:700;">「我传的是文件又不是消息，为什么还有字数限制？」</span></p>
+  <p class="body-p" style="color:rgba(255,255,255,.7);">原因很简单：AI读文件，也是把内容转成Token放进「上下文窗口」来处理的。文件再大，也绕不开这个容量限制。</p>
+  <p class="body-p" style="color:rgba(255,255,255,.7);">小王后来用这3步解决了问题：</p>
+
+  <div class="fix-box">
+    <div class="fix-title">// 解决方案：分批 + 摘要</div>
+    <div class="fix-step">
+      <div class="fix-num">1</div>
+      <div class="fix-text">把100份ECN文件<b>按月份分成4批</b>，每批25份，分别让AI处理</div>
+    </div>
+    <div class="fix-step">
+      <div class="fix-num">2</div>
+      <div class="fix-text">让AI先对每批<b>输出摘要</b>（每份ECN压缩到5行以内）</div>
+    </div>
+    <div class="fix-step">
+      <div class="fix-num">3</div>
+      <div class="fix-text">把4批摘要合并，再喂给AI做<b>最终汇总分析</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARD 4 · EXPLAIN ══ -->
+<div class="card card-explain">
+  <div class="section-head dark">🏭 用白板容量，理解上下文窗口</div>
+
+  <p class="body-p">你见过会议室里那块大白板吗？</p>
+  <p class="body-p"><strong>上下文窗口，就是AI工作时用的那块白板。</strong></p>
+
+  <div class="whiteboard">
+    <div class="wb-full-badge">AI的白板（上下文窗口）</div>
+    <div class="wb-title">// 白板上写着的内容</div>
+    <div class="wb-content">
+      <div class="wb-item">
+        <div class="wb-dot" style="background:#7C3AED;"></div>
+        <div class="wb-item-text">你发给AI的问题（你的Prompt）</div>
+      </div>
+      <div class="wb-item">
+        <div class="wb-dot" style="background:#A855F7;"></div>
+        <div class="wb-item-text">你上传的文件内容（设备手册、ECN记录…）</div>
+      </div>
+      <div class="wb-item">
+        <div class="wb-dot" style="background:#EC4899;"></div>
+        <div class="wb-item-text">之前的对话历史（聊了多少轮就占多少）</div>
+      </div>
+      <hr class="wb-divider">
+      <div class="wb-item">
+        <div class="wb-dot" style="background:#FFD166;"></div>
+        <div class="wb-item-text" style="color:#B45309;font-weight:700;">白板写满了 → AI就「看不见」早期内容了</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="body-p">白板越大，AI能同时「看到」的内容越多。不同模型的白板大小差很多：</p>
+
+  <div class="capacity-meter">
+    <div class="cm-label"><span>GPT-3.5</span><span style="color:var(--purple);">4K tokens ≈ 约6页A4</span></div>
+    <div class="cm-bar-bg cm-small"><div class="cm-bar-fill"><span>4K</span></div></div>
+  </div>
+  <div class="capacity-meter">
+    <div class="cm-label"><span>GPT-4o / Claude</span><span style="color:var(--purple);">128K tokens ≈ 约200页</span></div>
+    <div class="cm-bar-bg cm-medium"><div class="cm-bar-fill"><span>128K</span></div></div>
+  </div>
+  <div class="capacity-meter">
+    <div class="cm-label"><span>Gemini 1.5 Pro</span><span style="color:var(--purple);">1M tokens ≈ 约1500页</span></div>
+    <div class="cm-bar-bg cm-large"><div class="cm-bar-fill"><span>1M ✦</span></div></div>
+  </div>
+
+  <div class="info-box" style="margin-top:14px;">
+    <p>💡 <b>关键规律：</b>窗口用到70%以上时，AI对早期内容的注意力开始下降，回答质量悄悄变差——这就是为什么文件越长、对话越久，AI越「健忘」。</p>
+  </div>
+</div>
+
+<!-- ══ CARD 5 · 实战 ══ -->
+<div class="card card-scenes">
+  <div class="section-head orange">🏭 手机厂3个绕过窗口限制的方法</div>
+
+  <div class="scene-block s1">
+    <div class="scene-role mgmt">👔 管理层 · 知识库建设</div>
+    <div class="scene-title">📚 大量SOP文件上传AI知识库</div>
+    <div class="scene-body">
+      不是一次性把500份SOP全丢给AI——那样肯定超限。正确做法：
+    </div>
+    <div class="method-box">
+      <b>用RAG架构</b>（明天会讲），把文件存入向量数据库，AI需要哪段内容就精准调取哪段，<b>只把「相关内容」放进窗口</b>，永远不会超限。
+    </div>
+    <span class="tip-tag">💡 超大文件库 → 必须用RAG，不能直接丢</span>
+  </div>
+
+  <div class="scene-block s2">
+    <div class="scene-role eng">🔧 PE工程师 · 文件批处理</div>
+    <div class="scene-title">📄 批量分析ECN / 品质记录</div>
+    <div class="scene-body">
+      文件太多放不进一个窗口时，用「分批摘要再汇总」的方法：
+    </div>
+    <div class="method-box">
+      第一轮：每次处理<b>10-15份文件</b>，让AI输出摘要<br>
+      第二轮：把所有摘要合并，再做<b>整体分析</b><br>
+      效果：比一次性丢进去<b>准确率更高</b>，还不报错
+    </div>
+    <span class="tip-tag">💡 分批处理 = 化整为零，效果更好</span>
+  </div>
+
+  <div class="scene-block s3">
+    <div class="scene-role all">📋 全员 · 日常对话技巧</div>
+    <div class="scene-title">💬 长对话越聊越糊涂怎么办</div>
+    <div class="scene-body">
+      和AI聊了很多轮之后，它开始「忘记」前面说过的内容——这是窗口装满了。解决方法：
+    </div>
+    <div class="method-box">
+      每隔<b>15-20轮</b>，让AI先总结一下对话要点<br>
+      然后<b>开新对话</b>，把总结复制进去作为背景<br>
+      这样等于「清空白板，写上关键词再继续」
+    </div>
+    <span class="tip-tag">💡 定期「清空白板」，AI保持清醒</span>
+  </div>
+</div>
+
+<!-- ══ CARD 6 · 误区+技巧 ══ -->
+<div class="card card-mistakes">
+  <div class="section-head gold">❌ 误区 + ✅ 实战技巧</div>
+
+  <div class="mistake-box">
+    <h4>❌ 误区：上下文越长，AI理解越全面</h4>
+    <p>很多人以为把所有背景资料都塞给AI，它会理解得更好。实际上窗口超过70%后，AI的注意力会严重分散，<b style="color:#FF6B8A;">前期内容开始「消失」</b>，反而越来越乱。</p>
+  </div>
+
+  <table class="ctx-table">
+    <tr><th>常用模型</th><th>上下文大小</th><th>约等于</th></tr>
+    <tr>
+      <td class="name">DeepSeek-V3</td>
+      <td class="size">64K</td>
+      <td class="note">约100页A4文档</td>
+    </tr>
+    <tr>
+      <td class="name">Claude Sonnet 4</td>
+      <td class="size">200K</td>
+      <td class="note">约300页文档</td>
+    </tr>
+    <tr>
+      <td class="name">GPT-4o</td>
+      <td class="size">128K</td>
+      <td class="note">约200页文档</td>
+    </tr>
+    <tr>
+      <td class="name">Gemini 1.5 Pro</td>
+      <td class="size">1M</td>
+      <td class="note">约1500页文档 ✦</td>
+    </tr>
+  </table>
+
+  <div class="tips-box">
+    <h4>✅ 处理大文件的3个习惯</h4>
+    <div class="tip-item">单次输入文件不超过模型上下文限制的<b style="color:#fff;">60%</b>，留余量</div>
+    <div class="tip-item">大文件库用RAG向量数据库管理，不要直接堆进窗口</div>
+    <div class="tip-item">长对话定期总结重置，保持AI「清醒」</div>
+  </div>
+</div>
+
+<!-- ══ CARD 7 · CLOSE ══ -->
+<div class="card card-close">
+  <div class="section-head purple">💡 一句话总结</div>
+
+  <div class="summary-card">
+    <p>上下文窗口是AI工作时的白板，<br>有容量上限。<br><br>
+    文件太多或对话太久，白板写满了，<br>AI就开始「健忘」甚至报错。<br><br>
+    <b>解决方案：分批处理 + 定期清空 + 用RAG。</b></p>
+  </div>
+
+  <div class="interact-card">
+    <h4>💬 今天的互动问题</h4>
+    <p>你有没有遇到过<b>「AI越聊越答非所问」</b>，或者<b>「上传文件直接报错」</b>的情况？<br><br>
+    当时你是怎么解决的？评论区聊聊，
+    我们一起整理最实用的方法 👇</p>
+  </div>
+
+  <div class="preview-row">
+    <div class="blink"></div>
+    <div class="preview-text">
+      明天预告：<b>多模态</b><br>
+      AI能直接看产线照片找缺陷吗？能听懂车间的设备报警声吗？多模态，让AI长出眼睛和耳朵。
+    </div>
+  </div>
+
+  <div class="close-bar"></div>
+</div>
+
+<div class="nav-dots">
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd on"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+</div>
+
+<p class="page-label" style="margin-bottom:24px;">📚 30天AI术语科普营 · 手机制造厂内部科普版 · Day 04</p>
+
+</body>
+</html>
