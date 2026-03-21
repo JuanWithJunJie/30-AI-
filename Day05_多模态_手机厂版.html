@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI术语科普营 · Day 05 · 多模态 · 手机制造厂版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --amber:    #F59E0B;
+    --orange:   #EA580C;
+    --gold:     #FFD166;
+    --warm:     #FFF7ED;
+    --red:      #E8003D;
+    --teal:     #0D9488;
+    --blue:     #2563EB;
+    --dark:     #1C0A00;
+    --brown:    #292013;
+    --ink:      #2D1A05;
+    --muted:    #92785A;
+    --cream:    #FFFBF2;
+    --white:    #FFFFFF;
+    --card-w:   390px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #EDE0C8;
+    font-family: 'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    gap:20px; padding:40px 20px;
+  }
+  .card {
+    width:var(--card-w); border-radius:20px; overflow:hidden;
+    box-shadow:0 6px 36px rgba(0,0,0,.16); position:relative;
+  }
+
+  /* ══ CARD 1 · COVER ══ */
+  .card-cover {
+    background: var(--dark); min-height:540px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:40px 34px;
+  }
+  .card-cover::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 82% 6%,  #F59E0B50 0%, transparent 52%),
+      radial-gradient(ellipse at 10% 80%, #EA580C28 0%, transparent 50%);
+  }
+  .card-cover::after {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(245,158,11,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,158,11,.05) 1px, transparent 1px);
+    background-size:34px 34px;
+  }
+
+  /* eye / sensor decorative icons top-right */
+  .cover-sensors {
+    position:absolute; top:48px; right:26px; z-index:2;
+    display:flex; flex-direction:column; gap:10px; align-items:flex-end;
+  }
+  .sensor-row { display:flex; gap:8px; align-items:center; }
+  .sensor-icon {
+    width:36px; height:36px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .si-eye   { background:rgba(245,158,11,.2); border:1px solid rgba(245,158,11,.4); }
+  .si-ear   { background:rgba(234,88,12,.2);  border:1px solid rgba(234,88,12,.4); }
+  .si-txt   { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); }
+  .si-file  { background:rgba(13,148,136,.2);  border:1px solid rgba(13,148,136,.4); }
+  .sensor-label { font-size:10px; color:rgba(255,255,255,.35); letter-spacing:1px; }
+
+  .cover-series { position:absolute; top:28px; left:34px; display:flex; gap:8px; align-items:center; z-index:2; }
+  .cover-pill   { background:var(--amber); color:#fff; font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; letter-spacing:1px; }
+  .cover-pill-o { border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.5); font-size:11px; padding:5px 12px; border-radius:20px; }
+  .cover-day  { font-size:11px; color:rgba(255,255,255,.32); letter-spacing:4px; margin-bottom:10px; position:relative; z-index:2; }
+  .cover-word { font-size:74px; font-weight:900; color:#fff; line-height:.92; letter-spacing:-1px; position:relative; z-index:2; }
+  .cover-word em { font-style:normal; color:var(--gold); text-shadow:0 0 40px rgba(255,209,102,.45); }
+  .cover-sub  { font-size:12px; color:rgba(255,255,255,.25); letter-spacing:3px; margin-top:6px; position:relative; z-index:2; }
+  .cover-tagline { font-size:14px; color:rgba(255,255,255,.62); margin-top:18px; line-height:1.75; border-left:3px solid var(--amber); padding-left:14px; position:relative; z-index:2; }
+  .cover-audience { position:absolute; bottom:52px; right:34px; display:flex; flex-direction:column; gap:5px; z-index:2; align-items:flex-end; }
+  .aud-tag { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); color:rgba(255,255,255,.5); font-size:10px; padding:3px 10px; border-radius:10px; }
+  .cover-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--orange),var(--amber),var(--gold)); }
+
+  /* ══ SHARED ══ */
+  .role-banner { display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:12px; margin-bottom:20px; }
+  .role-banner.mgmt { background:#FFF0F3; border:1.5px solid #FFCCD5; }
+  .role-banner.eng  { background:#FFFBF0; border:1.5px solid #FFE0B2; }
+  .role-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .role-dot.mgmt { background:var(--red); }
+  .role-dot.eng  { background:var(--amber); }
+  .role-label { font-size:12px; font-weight:700; letter-spacing:1px; }
+  .role-label.mgmt { color:var(--red); }
+  .role-label.eng  { color:var(--orange); }
+  .role-sub { font-size:11px; color:var(--muted); margin-left:auto; }
+  .scene-loc { font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .body-p { font-size:14px; color:var(--ink); line-height:1.95; margin-bottom:14px; }
+  .quote-wrap { border-left:4px solid var(--amber); border-radius:0 14px 14px 0; padding:16px 18px; margin:16px 0; position:relative; }
+  .quote-wrap::before { content:'"'; position:absolute; top:-6px; left:14px; font-size:44px; opacity:.2; line-height:1; color:var(--amber); }
+  .quote-wrap p { font-size:13.5px; color:var(--ink); line-height:1.85; font-style:italic; }
+  .quote-wrap .spk { font-size:11px; color:var(--muted); margin-top:8px; font-style:normal; font-weight:600; }
+  .hl-amber { font-weight:700; color:var(--orange); }
+  .hl-red   { font-weight:700; color:var(--red); }
+  .hl-teal  { font-weight:700; color:var(--teal); }
+
+  /* ══ CARD 2 · 管理层 ══ */
+  .card-mgmt { background:var(--white); padding:36px 30px; min-height:590px; }
+  .quote-wrap.mgmt-q { background:#FFFBF0; }
+
+  /* before/after inspection compare */
+  .inspect-compare {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;
+  }
+  .ic-box { border-radius:14px; padding:16px; text-align:center; }
+  .ic-box.before { background:#F5F5F5; border:1.5px dashed #CCC; }
+  .ic-box.after  { background:#FFF8E8; border:1.5px solid #FFD166; }
+  .ic-label { font-size:10px; font-weight:700; letter-spacing:2px; margin-bottom:8px; }
+  .ic-box.before .ic-label { color:#999; }
+  .ic-box.after  .ic-label { color:var(--amber); }
+  .ic-icon  { font-size:32px; margin-bottom:8px; }
+  .ic-title { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:6px; }
+  .ic-body  { font-size:11.5px; color:var(--muted); line-height:1.7; }
+  .ic-result { font-size:11px; font-weight:700; margin-top:8px; }
+  .ic-box.before .ic-result { color:#999; }
+  .ic-box.after  .ic-result { color:var(--orange); }
+
+  /* ══ CARD 3 · 工程师 ══ */
+  .card-eng { background:var(--brown); padding:36px 30px; min-height:580px; }
+  .card-eng::before {
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(245,158,11,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,.05) 1px,transparent 1px);
+    background-size:28px 28px;
+  }
+  .card-eng .body-p  { color:rgba(255,255,255,.72); }
+  .card-eng .scene-loc { color:rgba(255,255,255,.3); }
+  .card-eng .quote-wrap { background:rgba(255,255,255,.05); border-left-color:var(--gold); }
+  .card-eng .quote-wrap::before { color:var(--gold); }
+  .card-eng .quote-wrap p { color:rgba(255,255,255,.82); }
+  .card-eng .quote-wrap .spk { color:rgba(255,255,255,.32); }
+
+  /* modality input visual */
+  .modality-flow {
+    background:rgba(0,0,0,.35); border:1px solid rgba(245,158,11,.2);
+    border-radius:14px; padding:18px; margin:14px 0;
+  }
+  .mf-title { font-size:11px; color:rgba(255,255,255,.3); letter-spacing:2px; margin-bottom:14px; font-family:'Courier New',monospace; }
+  .mf-inputs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .mf-chip {
+    display:flex; align-items:center; gap:6px;
+    padding:7px 12px; border-radius:10px; font-size:12px; font-weight:700;
+  }
+  .mf-chip.img  { background:rgba(245,158,11,.2); border:1px solid rgba(245,158,11,.4); color:#FCD34D; }
+  .mf-chip.txt  { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.7); }
+  .mf-chip.aud  { background:rgba(13,148,136,.2); border:1px solid rgba(13,148,136,.4); color:#5EEAD4; }
+  .mf-chip.doc  { background:rgba(37,99,235,.2); border:1px solid rgba(37,99,235,.4); color:#93C5FD; }
+  .mf-arrow { text-align:center; font-size:20px; color:rgba(255,255,255,.3); margin:6px 0; }
+  .mf-output {
+    background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(234,88,12,.15));
+    border:1px solid rgba(245,158,11,.35); border-radius:10px;
+    padding:12px; font-size:13px; color:rgba(255,255,255,.85); line-height:1.7;
+  }
+  .mf-output b { color:var(--gold); }
+
+  /* ══ CARD 4 · EXPLAIN ══ */
+  .card-explain { background:var(--cream); padding:36px 30px; min-height:640px; }
+  .section-head { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:7px 16px; border-radius:10px; margin-bottom:22px; }
+  .section-head.amber  { background:var(--amber);  color:#fff; }
+  .section-head.orange { background:var(--orange); color:#fff; }
+  .section-head.dark   { background:var(--dark);   color:#fff; }
+  .section-head.teal   { background:var(--teal);   color:#fff; }
+  .section-head.red    { background:var(--red);    color:#fff; }
+  .section-head.gold   { background:var(--gold);   color:var(--ink); }
+
+  /* sense analogy grid */
+  .sense-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+  .sense-card { background:var(--white); border:1.5px solid #FFE4B2; border-radius:14px; padding:14px; text-align:center; }
+  .sense-card.active { background:#FFF8E8; border-color:var(--amber); box-shadow:0 2px 12px rgba(245,158,11,.15); }
+  .sense-emoji { font-size:28px; margin-bottom:6px; }
+  .sense-name  { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .sense-desc  { font-size:11px; color:var(--muted); line-height:1.6; }
+  .sense-tag   { display:inline-block; font-size:10px; font-weight:700; padding:3px 8px; border-radius:8px; margin-top:6px; }
+  .sense-card.active .sense-tag { background:rgba(245,158,11,.15); color:var(--orange); }
+  .sense-card:not(.active) .sense-tag { background:#F0F0F0; color:#999; }
+
+  /* uni → multi visual */
+  .evolution-box { background:var(--white); border:1.5px solid #FFE4B2; border-radius:16px; padding:18px; margin:14px 0; }
+  .evo-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .evo-row:last-child { margin-bottom:0; }
+  .evo-label { width:68px; font-size:11px; font-weight:700; flex-shrink:0; }
+  .evo-label.old { color:#BBB; }
+  .evo-label.new { color:var(--amber); }
+  .evo-chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .evo-chip { font-size:11px; padding:4px 10px; border-radius:8px; font-weight:600; }
+  .evo-chip.grey { background:#F0F0F0; color:#999; }
+  .evo-chip.warm { background:#FFF3D6; color:var(--orange); border:1px solid #FFE0A0; }
+
+  .info-box { background:var(--white); border:1.5px solid #FFE4B2; border-radius:14px; padding:16px; margin:12px 0; }
+  .info-box p { font-size:13px; color:var(--ink); line-height:1.85; }
+  .info-box b { color:var(--orange); }
+
+  /* ══ CARD 5 · 实战 ══ */
+  .card-scenes { background:var(--white); padding:36px 30px; min-height:680px; }
+  .scene-block { border-radius:16px; padding:18px; margin:12px 0; position:relative; overflow:hidden; }
+  .scene-block::after { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+  .scene-block.s1 { background:#FFF8E8; border:1.5px solid #FFE0B2; }
+  .scene-block.s1::after { background:linear-gradient(90deg,var(--amber),var(--gold)); }
+  .scene-block.s2 { background:#F0FDFA; border:1.5px solid #99F6E4; }
+  .scene-block.s2::after { background:linear-gradient(90deg,var(--teal),#14B8A6); }
+  .scene-block.s3 { background:#EFF6FF; border:1.5px solid #BFDBFE; }
+  .scene-block.s3::after { background:linear-gradient(90deg,var(--blue),#60A5FA); }
+  .scene-role { font-size:10px; font-weight:700; letter-spacing:2px; margin-bottom:6px; }
+  .scene-role.mgmt { color:var(--red); }
+  .scene-role.eng  { color:var(--orange); }
+  .scene-role.all  { color:var(--blue); }
+  .scene-title { font-size:15px; font-weight:700; color:var(--ink); margin-bottom:8px; }
+  .scene-body  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .scene-body b { color:var(--ink); }
+  .prompt-box {
+    background:rgba(0,0,0,.04); border-radius:10px;
+    padding:10px 12px; margin:10px 0;
+    font-size:12px; color:var(--ink); line-height:1.75;
+    border-left:3px solid var(--amber);
+    font-family:'Courier New',monospace;
+  }
+  .prompt-box b { color:var(--orange); font-family:'Noto Sans SC',sans-serif; }
+  .tip-tag { display:inline-block; background:#FFF3D6; color:#92400E; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; margin-top:10px; }
+
+  /* ══ CARD 6 · 误区 ══ */
+  .card-mistakes { background:linear-gradient(155deg,var(--dark) 0%,#2D1800 100%); padding:36px 30px; min-height:520px; }
+  .mistake-box { background:rgba(232,0,61,.1); border:1px solid rgba(232,0,61,.25); border-radius:16px; padding:16px; margin:12px 0; }
+  .mistake-box h4 { font-size:13px; font-weight:700; color:#FF6B8A; margin-bottom:8px; }
+  .mistake-box p  { font-size:13px; color:rgba(255,255,255,.65); line-height:1.8; }
+  .tips-box { background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); border-radius:16px; padding:16px; margin:12px 0; }
+  .tips-box h4 { font-size:13px; font-weight:700; color:var(--gold); margin-bottom:8px; }
+  .tip-item { font-size:13px; color:rgba(255,255,255,.65); padding:5px 0; display:flex; gap:10px; line-height:1.7; }
+  .tip-item::before { content:'→'; color:var(--gold); font-weight:700; flex-shrink:0; }
+
+  /* model support table */
+  .support-table { width:100%; border-collapse:collapse; margin:14px 0; border-radius:10px; overflow:hidden; }
+  .support-table th { background:var(--orange); color:#fff; font-size:12px; font-weight:700; padding:9px 12px; text-align:left; }
+  .support-table td { padding:8px 12px; font-size:12px; border-bottom:1px solid rgba(255,255,255,.06); }
+  .support-table tr:last-child td { border-bottom:none; }
+  .support-table td.name { color:rgba(255,255,255,.8); }
+  .support-table td.modes { font-family:'Courier New',monospace; }
+  .dot-y { color:var(--gold); }
+  .dot-n { color:rgba(255,255,255,.25); }
+
+  /* ══ CARD 7 · CLOSE ══ */
+  .card-close { background:var(--white); padding:36px 30px; min-height:460px; display:flex; flex-direction:column; gap:18px; }
+  .summary-card { background:linear-gradient(135deg,var(--orange) 0%,var(--amber) 100%); border-radius:18px; padding:24px; }
+  .summary-card p { font-size:15px; font-weight:700; color:#fff; line-height:1.75; }
+  .interact-card { background:var(--cream); border:1.5px solid #FFE4B2; border-radius:18px; padding:20px; }
+  .interact-card h4 { font-size:13px; font-weight:700; color:var(--orange); margin-bottom:10px; }
+  .interact-card p  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .interact-card b  { color:var(--ink); }
+  .preview-row { background:var(--dark); border-radius:14px; padding:14px 18px; display:flex; align-items:flex-start; gap:12px; }
+  .blink { width:8px; height:8px; background:var(--gold); border-radius:50%; flex-shrink:0; margin-top:4px; animation:blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+  .preview-text { font-size:13px; color:rgba(255,255,255,.5); line-height:1.7; }
+  .preview-text b { color:#fff; }
+  .close-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--orange),var(--amber),var(--gold)); }
+
+  .nav-dots { display:flex; gap:6px; justify-content:center; }
+  .nd { width:6px; height:6px; border-radius:50%; background:#D4C4A8; }
+  .nd.on { background:var(--amber); width:20px; border-radius:3px; }
+  .page-label { font-size:11px; color:#9A8060; letter-spacing:1px; text-align:center; }
+</style>
+</head>
+<body>
+
+<p class="page-label">📱 小红书图文 · 共7张 · 手机制造厂版 · Day 05</p>
+
+<!-- ══ CARD 1 · COVER ══ -->
+<div class="card card-cover">
+  <div class="cover-series">
+    <span class="cover-pill">30天AI科普营</span>
+    <span class="cover-pill-o">Day 05</span>
+  </div>
+
+  <div class="cover-sensors">
+    <div class="sensor-row">
+      <span class="sensor-label">视觉</span>
+      <div class="sensor-icon si-eye">👁️</div>
+    </div>
+    <div class="sensor-row">
+      <span class="sensor-label">听觉</span>
+      <div class="sensor-icon si-ear">👂</div>
+    </div>
+    <div class="sensor-row">
+      <span class="sensor-label">语言</span>
+      <div class="sensor-icon si-txt">💬</div>
+    </div>
+    <div class="sensor-row">
+      <span class="sensor-label">文档</span>
+      <div class="sensor-icon si-file">📄</div>
+    </div>
+  </div>
+
+  <div class="cover-day">DAY 05 · 基础概念</div>
+  <div class="cover-word"><em>多</em>模态</div>
+  <div class="cover-sub">// MULTIMODAL AI</div>
+  <div class="cover-tagline">
+    把产线照片发给AI——<br>
+    它直接告诉我哪里有缺陷。<br>
+    AI，长出眼睛和耳朵了。
+  </div>
+  <div class="cover-audience">
+    <span class="aud-tag">👔 管理层</span>
+    <span class="aud-tag">🔧 工程师</span>
+    <span class="aud-tag">📋 品质/IE</span>
+  </div>
+  <div class="cover-bar"></div>
+</div>
+
+<!-- ══ CARD 2 · 管理层视角 ══ -->
+<div class="card card-mgmt">
+  <div class="role-banner mgmt">
+    <div class="role-dot mgmt"></div>
+    <span class="role-label mgmt">管理层视角</span>
+    <span class="role-sub">品质总监 / 生产总监</span>
+  </div>
+
+  <div class="scene-loc">📍 品质部 · 月度质检方案评审会</div>
+
+  <p class="body-p">上个月，品质总监王总在评审新的AI质检方案时，供应商演示了一个让他意外的功能——</p>
+  <p class="body-p">把手机后壳的生产照片直接发给AI，AI不到1秒就标出了照片里的划痕位置，还给出了判断依据。</p>
+
+  <div class="quote-wrap mgmt-q">
+    <p>等等，它能直接看图片？我以为AI只会聊天和写文章，原来还能帮我们看产品缺陷？</p>
+    <div class="spk">— 品质总监 王总</div>
+  </div>
+
+  <p class="body-p">这就是<span class="hl-amber">多模态AI</span>——不只处理文字，还能处理图像、音频、文件，甚至视频。</p>
+  <p class="body-p">对比一下传统AI质检和多模态AI质检的区别：</p>
+
+  <div class="inspect-compare">
+    <div class="ic-box before">
+      <div class="ic-label">❌ 传统方案</div>
+      <div class="ic-icon">👁️</div>
+      <div class="ic-title">人工目视检查</div>
+      <div class="ic-body">靠人眼看，每人每班检查200-500件，眼睛疲劳后漏检率上升</div>
+      <div class="ic-result">漏检率：2-5%</div>
+    </div>
+    <div class="ic-box after">
+      <div class="ic-label">✅ 多模态AI</div>
+      <div class="ic-icon">🤖</div>
+      <div class="ic-title">AI视觉质检</div>
+      <div class="ic-body">相机拍照 → AI实时分析，每秒处理20+张，24小时不疲劳</div>
+      <div class="ic-result">漏检率：＜0.5%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARD 3 · 工程师视角 ══ -->
+<div class="card card-eng">
+  <div class="role-banner eng" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);">
+    <div class="role-dot eng"></div>
+    <span class="role-label eng">工程师视角</span>
+    <span class="role-sub" style="color:rgba(255,255,255,.3);">QE / 自动化工程师</span>
+  </div>
+
+  <div class="scene-loc">📍 测试部 · 用AI分析设备异常报告</div>
+
+  <p class="body-p">QE工程师小林上周遇到了一个棘手问题：设备打印出来的异常波形图看不懂，要联系供应商远程支持，等待周期长达2天。</p>
+  <p class="body-p">他抱着试试看的心态，把波形图截图直接发给了AI，并输入：</p>
+
+  <div class="modality-flow">
+    <div class="mf-title">// 多模态输入示例</div>
+    <div class="mf-inputs">
+      <div class="mf-chip img">🖼️ 波形图截图</div>
+      <div class="mf-chip txt">💬 文字描述</div>
+      <div class="mf-chip doc">📄 设备参数表</div>
+    </div>
+    <div class="mf-arrow">↓ AI 多模态理解</div>
+    <div class="mf-output">
+      根据波形图显示，在<b>第3秒出现异常振幅峰值</b>，结合您提供的设备参数，初步判断为<b>伺服电机反馈信号干扰</b>，建议检查屏蔽线接地……
+    </div>
+  </div>
+
+  <p class="body-p" style="color:rgba(255,255,255,.7);">AI同时「看」了图片、「读」了文字、「理解」了文件背景，<span style="color:var(--gold);font-weight:700;">给出了和供应商一样的判断——但只花了30秒。</span></p>
+</div>
+
+<!-- ══ CARD 4 · EXPLAIN ══ -->
+<div class="card card-explain">
+  <div class="section-head dark">🏭 用感官类比，理解多模态</div>
+
+  <p class="body-p">人类工人能做好质检，靠的是<strong>多种感官同时工作</strong>：眼睛看外观、耳朵听设备声音、手感受产品表面、大脑综合判断。</p>
+  <p class="body-p"><strong>多模态AI，就是给AI配上了多种「感官输入通道」：</strong></p>
+
+  <div class="sense-grid">
+    <div class="sense-card active">
+      <div class="sense-emoji">👁️</div>
+      <div class="sense-name">视觉模态</div>
+      <div class="sense-desc">读取图片、视频、截图，识别外观缺陷、OCR文字</div>
+      <div class="sense-tag">✅ 已成熟落地</div>
+    </div>
+    <div class="sense-card active">
+      <div class="sense-emoji">💬</div>
+      <div class="sense-name">语言模态</div>
+      <div class="sense-desc">处理文字、PDF、报告，理解和生成自然语言</div>
+      <div class="sense-tag">✅ 已成熟落地</div>
+    </div>
+    <div class="sense-card active">
+      <div class="sense-emoji">🎵</div>
+      <div class="sense-name">音频模态</div>
+      <div class="sense-desc">识别语音、分析设备运转声音异常、语音转文字</div>
+      <div class="sense-tag">✅ 逐步落地</div>
+    </div>
+    <div class="sense-card">
+      <div class="sense-emoji">🎬</div>
+      <div class="sense-name">视频模态</div>
+      <div class="sense-desc">分析产线视频流，实时检测动作异常、操作违规</div>
+      <div class="sense-tag">🔧 快速发展中</div>
+    </div>
+  </div>
+
+  <div class="evolution-box">
+    <div class="evo-row">
+      <div class="evo-label old">以前的AI</div>
+      <div class="evo-chips">
+        <div class="evo-chip warm">💬 只会处理文字</div>
+        <div class="evo-chip grey">看不了图</div>
+        <div class="evo-chip grey">听不了声音</div>
+      </div>
+    </div>
+    <div class="evo-row">
+      <div class="evo-label new">现在的AI</div>
+      <div class="evo-chips">
+        <div class="evo-chip warm">💬 文字</div>
+        <div class="evo-chip warm">🖼️ 图片</div>
+        <div class="evo-chip warm">🎵 音频</div>
+        <div class="evo-chip warm">📄 文件</div>
+        <div class="evo-chip warm">🎬 视频</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <p>💡 <b>关键点：</b>多模态不是几个功能的拼凑，而是AI能<b>同时理解多种输入并综合分析</b>——就像你把产线照片+设备参数+异常描述一起发给AI，它能全部理解并给出判断。</p>
+  </div>
+</div>
+
+<!-- ══ CARD 5 · 实战 ══ -->
+<div class="card card-scenes">
+  <div class="section-head orange">🏭 手机厂3个多模态真实应用</div>
+
+  <div class="scene-block s1">
+    <div class="scene-role mgmt">👔 品质管理 · 视觉质检</div>
+    <div class="scene-title">📸 用AI分析产品外观缺陷照片</div>
+    <div class="scene-body">
+      不需要搭建复杂系统，直接用多模态AI做<b>快速判断</b>：
+    </div>
+    <div class="prompt-box">
+      [上传手机后壳照片]<br>
+      <b>你是品质工程师，</b>分析照片中是否存在划痕、<br>
+      压伤、色差等外观缺陷，如有请标注位置<br>
+      并判断是否超出AQL标准
+    </div>
+    <span class="tip-tag">💡 先用AI做初筛，减少人工复检工作量</span>
+  </div>
+
+  <div class="scene-block s2">
+    <div class="scene-role eng">🔧 设备维护 · 异常诊断</div>
+    <div class="scene-title">📊 设备异常波形图 + 报警截图分析</div>
+    <div class="scene-body">
+      把设备波形图截图 + 报警代码 + 设备型号一起发给AI：
+    </div>
+    <div class="prompt-box">
+      [上传波形图截图] [上传报警界面截图]<br>
+      设备型号：XXX贴片机 型号YYY<br>
+      <b>分析异常原因，</b>给出排查步骤，<br>
+      优先考虑不停机的处理方式
+    </div>
+    <span class="tip-tag">💡 比等供应商远程支持快10倍</span>
+  </div>
+
+  <div class="scene-block s3">
+    <div class="scene-role all">📋 全员 · 文件处理</div>
+    <div class="scene-title">📑 英文技术手册图文混排页面</div>
+    <div class="scene-body">
+      设备手册里有大量图表和文字混排，传统OCR效果差：
+    </div>
+    <div class="prompt-box">
+      [上传手册页面截图]<br>
+      <b>翻译这一页内容，</b>保留表格结构，<br>
+      图片里的标注文字也一并翻译，<br>
+      用维修人员能看懂的中文输出
+    </div>
+    <span class="tip-tag">💡 图文混排页面，多模态AI比OCR强多了</span>
+  </div>
+</div>
+
+<!-- ══ CARD 6 · 误区+技巧 ══ -->
+<div class="card card-mistakes">
+  <div class="section-head gold">❌ 误区 + ✅ 使用技巧</div>
+
+  <div class="mistake-box">
+    <h4>❌ 误区：多模态AI能完全替代专业视觉质检系统？</h4>
+    <p>通用多模态AI（如ChatGPT、Claude）适合<b style="color:#FF6B8A;">辅助判断和快速分析</b>，但工业级AOI质检系统是在海量产线数据上专项训练的。两者不是替代关系，而是<b style="color:#FF6B8A;">互补关系</b>。</p>
+  </div>
+
+  <div class="mistake-box">
+    <h4>❌ 误区：发图片给AI，它什么都能识别？</h4>
+    <p>图片质量、光线、角度都会影响识别效果。模糊照片、逆光截图、分辨率太低的图片，AI也会「看不清」，结果不准。<b style="color:#FF6B8A;">拍清楚是前提。</b></p>
+  </div>
+
+  <table class="support-table">
+    <tr><th>常用AI工具</th><th>支持的模态</th></tr>
+    <tr>
+      <td class="name">GPT-4o</td>
+      <td class="modes"><span class="dot-y">图片✓</span> <span class="dot-y">文字✓</span> <span class="dot-y">音频✓</span> <span class="dot-y">视频✓</span></td>
+    </tr>
+    <tr>
+      <td class="name">Claude Sonnet 4</td>
+      <td class="modes"><span class="dot-y">图片✓</span> <span class="dot-y">文字✓</span> <span class="dot-y">文件✓</span> <span class="dot-n">音频—</span></td>
+    </tr>
+    <tr>
+      <td class="name">Gemini 1.5 Pro</td>
+      <td class="modes"><span class="dot-y">图片✓</span> <span class="dot-y">文字✓</span> <span class="dot-y">音频✓</span> <span class="dot-y">视频✓</span></td>
+    </tr>
+    <tr>
+      <td class="name">DeepSeek-V3</td>
+      <td class="modes"><span class="dot-n">图片—</span> <span class="dot-y">文字✓</span> <span class="dot-n">音频—</span> <span class="dot-n">视频—</span></td>
+    </tr>
+  </table>
+
+  <div class="tips-box">
+    <h4>✅ 多模态AI使用3个技巧</h4>
+    <div class="tip-item">发图片时同步说明背景：型号、工序、拍摄条件，AI判断更准</div>
+    <div class="tip-item">图文混排内容优先用多模态AI，不要再手动OCR了</div>
+    <div class="tip-item">设备报警截图+文字描述组合发送，比单独发文字解释得更清楚</div>
+  </div>
+</div>
+
+<!-- ══ CARD 7 · CLOSE ══ -->
+<div class="card card-close">
+  <div class="section-head amber">💡 一句话总结</div>
+
+  <div class="summary-card">
+    <p>多模态是给AI装上了多种感官——<br>
+    眼睛（图像）、耳朵（音频）、大脑（文字）<br>同时工作。<br><br>
+    <b>对我们手机厂来说：产线照片、设备截图、波形图，现在都可以直接「问AI」了。</b></p>
+  </div>
+
+  <div class="interact-card">
+    <h4>💬 今天的互动问题</h4>
+    <p>你们厂现在有没有用AI分析过<b>图片或截图</b>？<br>
+    比如把设备报错界面截图发给AI问原因，或者让AI看过产品照片？<br><br>
+    有的话效果怎么样？没有的话，看完今天愿不愿意试试？评论区见 👇</p>
+  </div>
+
+  <div class="preview-row">
+    <div class="blink"></div>
+    <div class="preview-text">
+      明天预告：<b>训练与微调</b><br>
+      供应商说「帮你微调一个专属模型」——这要花多少钱？值不值？微调和重新训练有什么区别？
+    </div>
+  </div>
+
+  <div class="close-bar"></div>
+</div>
+
+<div class="nav-dots">
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd on"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+</div>
+
+<p class="page-label" style="margin-bottom:24px;">📚 30天AI术语科普营 · 手机制造厂内部科普版 · Day 05</p>
+
+</body>
+</html>
