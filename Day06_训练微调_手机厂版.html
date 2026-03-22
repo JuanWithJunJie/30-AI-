@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI术语科普营 · Day 06 · 训练与微调 · 手机制造厂版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --cyan:    #0891B2;
+    --sky:     #38BDF8;
+    --ice:     #BAE6FD;
+    --mint:    #CCFBF1;
+    --red:     #E8003D;
+    --orange:  #FF6B35;
+    --gold:    #FFD166;
+    --green:   #059669;
+    --dark:    #04111A;
+    --deep:    #071C28;
+    --ink:     #0C2233;
+    --muted:   #5B7A8A;
+    --cream:   #F0FAFF;
+    --white:   #FFFFFF;
+    --card-w:  390px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #C8E4EF;
+    font-family: 'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    gap:20px; padding:40px 20px;
+  }
+  .card {
+    width:var(--card-w); border-radius:20px; overflow:hidden;
+    box-shadow:0 6px 36px rgba(0,0,0,.15); position:relative;
+  }
+
+  /* ══ CARD 1 · COVER ══ */
+  .card-cover {
+    background: var(--dark); min-height:540px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:40px 34px;
+  }
+  .card-cover::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 80% 8%,  #0891B255 0%, transparent 52%),
+      radial-gradient(ellipse at 12% 82%, #38BDF828 0%, transparent 50%);
+  }
+  .card-cover::after {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(8,145,178,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(8,145,178,.06) 1px, transparent 1px);
+    background-size:32px 32px;
+  }
+
+  /* Training pipeline decoration top-right */
+  .cover-pipeline {
+    position:absolute; top:48px; right:26px; z-index:2;
+    display:flex; flex-direction:column; gap:6px; width:116px;
+  }
+  .pipe-step {
+    display:flex; align-items:center; gap:7px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+    border-radius:8px; padding:6px 10px;
+  }
+  .pipe-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .pd-base   { background:#555; }
+  .pd-data   { background:var(--cyan); box-shadow:0 0 6px rgba(8,145,178,.6); }
+  .pd-train  { background:var(--sky);  box-shadow:0 0 6px rgba(56,189,248,.6); }
+  .pd-done   { background:#22C55E; box-shadow:0 0 6px rgba(34,197,94,.6); }
+  .pipe-label { font-size:9px; color:rgba(255,255,255,.4); letter-spacing:1px; }
+  .pipe-arrow { text-align:center; font-size:12px; color:rgba(255,255,255,.15); margin:-2px 0; }
+
+  .cover-series { position:absolute; top:28px; left:34px; display:flex; gap:8px; align-items:center; z-index:2; }
+  .cover-pill   { background:var(--cyan); color:#fff; font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; letter-spacing:1px; }
+  .cover-pill-o { border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.5); font-size:11px; padding:5px 12px; border-radius:20px; }
+  .cover-day  { font-size:11px; color:rgba(255,255,255,.32); letter-spacing:4px; margin-bottom:10px; position:relative; z-index:2; }
+  .cover-word { font-size:60px; font-weight:900; color:#fff; line-height:.95; letter-spacing:-1px; position:relative; z-index:2; }
+  .cover-word em { font-style:normal; color:var(--sky); text-shadow:0 0 40px rgba(56,189,248,.45); }
+  .cover-sub  { font-size:12px; color:rgba(255,255,255,.25); letter-spacing:3px; margin-top:6px; position:relative; z-index:2; }
+  .cover-tagline { font-size:14px; color:rgba(255,255,255,.62); margin-top:18px; line-height:1.75; border-left:3px solid var(--cyan); padding-left:14px; position:relative; z-index:2; }
+  .cover-audience { position:absolute; bottom:52px; right:34px; display:flex; flex-direction:column; gap:5px; z-index:2; align-items:flex-end; }
+  .aud-tag { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); color:rgba(255,255,255,.5); font-size:10px; padding:3px 10px; border-radius:10px; }
+  .cover-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--cyan),var(--sky),var(--ice)); }
+
+  /* ══ SHARED ══ */
+  .role-banner { display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:12px; margin-bottom:20px; }
+  .role-banner.mgmt { background:#FFF0F3; border:1.5px solid #FFCCD5; }
+  .role-banner.eng  { background:#F0FAFF; border:1.5px solid #BAE6FD; }
+  .role-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .role-dot.mgmt { background:var(--red); }
+  .role-dot.eng  { background:var(--cyan); }
+  .role-label { font-size:12px; font-weight:700; letter-spacing:1px; }
+  .role-label.mgmt { color:var(--red); }
+  .role-label.eng  { color:var(--cyan); }
+  .role-sub { font-size:11px; color:var(--muted); margin-left:auto; }
+  .scene-loc { font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .body-p { font-size:14px; color:var(--ink); line-height:1.95; margin-bottom:14px; }
+  .quote-wrap { border-left:4px solid var(--orange); border-radius:0 14px 14px 0; padding:16px 18px; margin:16px 0; position:relative; }
+  .quote-wrap::before { content:'"'; position:absolute; top:-6px; left:14px; font-size:44px; opacity:.2; line-height:1; color:var(--orange); }
+  .quote-wrap p { font-size:13.5px; color:var(--ink); line-height:1.85; font-style:italic; }
+  .quote-wrap .spk { font-size:11px; color:var(--muted); margin-top:8px; font-style:normal; font-weight:600; }
+  .hl-cyan { font-weight:700; color:var(--cyan); }
+  .hl-red  { font-weight:700; color:var(--red); }
+  .hl-green{ font-weight:700; color:var(--green); }
+
+  /* ══ CARD 2 · 管理层 ══ */
+  .card-mgmt { background:var(--white); padding:36px 30px; min-height:600px; }
+  .quote-wrap.mgmt-q { background:#FFFBF0; }
+
+  /* price negotiation flow */
+  .nego-flow { margin:16px 0; display:flex; flex-direction:column; gap:10px; }
+  .nego-row { display:flex; gap:12px; align-items:flex-start; }
+  .nego-tag { flex-shrink:0; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; }
+  .nt-vendor { background:#FFF0F0; color:var(--red); border:1px solid #FFCDD2; }
+  .nt-mgmt   { background:#F0FAFF; color:var(--cyan); border:1px solid #BAE6FD; }
+  .nego-text { font-size:13px; color:var(--ink); line-height:1.75; padding-top:3px; }
+  .nego-text b { color:var(--cyan); }
+  .nego-text .red { color:var(--red); font-weight:700; }
+  .nego-divider { border:none; border-left:2px dashed #E0E0E0; height:16px; margin-left:38px; }
+
+  .price-result {
+    background: linear-gradient(135deg,#F0FAFF,#E0F7FA);
+    border:1.5px solid #BAE6FD; border-radius:14px;
+    padding:16px; margin-top:14px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .pr-before { text-align:center; }
+  .pr-before .num { font-size:28px; font-weight:900; color:#CCC; text-decoration:line-through; }
+  .pr-before .label { font-size:11px; color:#999; }
+  .pr-arrow { font-size:24px; color:var(--cyan); }
+  .pr-after { text-align:center; }
+  .pr-after .num { font-size:32px; font-weight:900; color:var(--green); }
+  .pr-after .label { font-size:11px; color:var(--green); font-weight:700; }
+  .pr-note { flex:1; font-size:12px; color:var(--muted); line-height:1.7; }
+  .pr-note b { color:var(--cyan); }
+
+  /* ══ CARD 3 · 工程师 ══ */
+  .card-eng { background:var(--deep); padding:36px 30px; min-height:580px; }
+  .card-eng::before {
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(8,145,178,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(8,145,178,.06) 1px,transparent 1px);
+    background-size:28px 28px;
+  }
+  .card-eng .body-p { color:rgba(255,255,255,.72); }
+  .card-eng .scene-loc { color:rgba(255,255,255,.3); }
+  .card-eng .quote-wrap { background:rgba(255,255,255,.05); border-left-color:var(--sky); }
+  .card-eng .quote-wrap::before { color:var(--sky); }
+  .card-eng .quote-wrap p { color:rgba(255,255,255,.82); }
+  .card-eng .quote-wrap .spk { color:rgba(255,255,255,.32); }
+
+  /* training vs finetune visual */
+  .compare-visual { display:flex; flex-direction:column; gap:12px; margin:14px 0; }
+  .cv-row { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:16px; }
+  .cv-row.highlight { background:rgba(8,145,178,.12); border-color:rgba(56,189,248,.3); }
+  .cv-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .cv-title { font-size:13px; font-weight:700; color:#fff; }
+  .cv-badge { font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; }
+  .cvb-expensive { background:rgba(232,0,61,.2); color:#FF6B8A; }
+  .cvb-smart     { background:rgba(8,145,178,.2); color:var(--sky); }
+  .cv-stats { display:flex; gap:10px; flex-wrap:wrap; }
+  .cv-stat { background:rgba(0,0,0,.25); border-radius:8px; padding:6px 10px; }
+  .cv-stat .s-num { font-size:14px; font-weight:700; }
+  .cv-stat .s-label { font-size:10px; color:rgba(255,255,255,.4); }
+  .stat-red { color:#FF6B8A; }
+  .stat-sky { color:var(--sky); }
+  .stat-grn { color:#4ADE80; }
+
+  /* ══ CARD 4 · EXPLAIN ══ */
+  .card-explain { background:var(--cream); padding:36px 30px; min-height:640px; }
+  .section-head { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:7px 16px; border-radius:10px; margin-bottom:22px; }
+  .section-head.cyan   { background:var(--cyan);   color:#fff; }
+  .section-head.dark   { background:var(--dark);   color:#fff; }
+  .section-head.orange { background:var(--orange); color:#fff; }
+  .section-head.red    { background:var(--red);    color:#fff; }
+  .section-head.gold   { background:var(--gold);   color:var(--ink); }
+  .section-head.green  { background:var(--green);  color:#fff; }
+
+  /* worker analogy */
+  .worker-analogy { display:flex; flex-direction:column; gap:10px; margin:14px 0; }
+  .wa-row { display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start; }
+  .wa-icon {
+    width:48px; height:48px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; flex-shrink:0;
+  }
+  .wi-train { background:#FFF0F0; }
+  .wi-fine  { background:#F0FAFF; }
+  .wa-content {}
+  .wa-title { font-size:14px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .wa-desc  { font-size:12.5px; color:var(--muted); line-height:1.75; }
+  .wa-desc b { color:var(--ink); }
+  .wa-tags  { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+  .wa-tag   { font-size:10px; padding:3px 8px; border-radius:6px; font-weight:600; }
+  .wt-red  { background:#FFF0F0; color:var(--red); }
+  .wt-cyan { background:#F0FAFF; color:var(--cyan); }
+  .wt-grn  { background:#F0FFF4; color:var(--green); }
+
+  .key-diff-box {
+    background:var(--white); border:1.5px solid #BAE6FD;
+    border-radius:16px; padding:18px; margin:14px 0;
+  }
+  .kd-title { font-size:12px; font-weight:700; color:var(--cyan); letter-spacing:1px; margin-bottom:12px; }
+  .kd-row { display:flex; gap:10px; margin-bottom:10px; align-items:flex-start; }
+  .kd-row:last-child { margin-bottom:0; }
+  .kd-key { width:52px; font-size:11px; font-weight:700; color:var(--cyan); flex-shrink:0; padding-top:2px; text-align:right; padding-right:8px; border-right:2px solid #BAE6FD; }
+  .kd-val { font-size:13px; color:var(--ink); line-height:1.7; }
+  .kd-val b { color:var(--cyan); }
+
+  /* ══ CARD 5 · 实战 ══ */
+  .card-scenes { background:var(--white); padding:36px 30px; min-height:680px; }
+  .scene-block { border-radius:16px; padding:18px; margin:12px 0; position:relative; overflow:hidden; }
+  .scene-block::after { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+  .scene-block.s1 { background:#FFF8F0; border:1.5px solid #FFE0C0; }
+  .scene-block.s1::after { background:linear-gradient(90deg,var(--orange),var(--gold)); }
+  .scene-block.s2 { background:#F0FAFF; border:1.5px solid #BAE6FD; }
+  .scene-block.s2::after { background:linear-gradient(90deg,var(--cyan),var(--sky)); }
+  .scene-block.s3 { background:#F0FFF4; border:1.5px solid #A7F3D0; }
+  .scene-block.s3::after { background:linear-gradient(90deg,var(--green),#34D399); }
+  .scene-role { font-size:10px; font-weight:700; letter-spacing:2px; margin-bottom:6px; }
+  .scene-role.mgmt { color:var(--red); }
+  .scene-role.eng  { color:var(--cyan); }
+  .scene-role.all  { color:var(--green); }
+  .scene-title { font-size:15px; font-weight:700; color:var(--ink); margin-bottom:8px; }
+  .scene-body  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .scene-body b { color:var(--ink); }
+  .decision-grid { display:flex; flex-direction:column; gap:7px; margin:10px 0; }
+  .dg-row { display:flex; gap:8px; align-items:flex-start; font-size:12.5px; }
+  .dg-q { color:var(--muted); line-height:1.7; flex:1; }
+  .dg-a { font-weight:700; flex-shrink:0; white-space:nowrap; }
+  .dg-a.yes  { color:var(--green); }
+  .dg-a.no   { color:var(--red); }
+  .dg-a.alt  { color:var(--cyan); }
+  .tip-tag { display:inline-block; background:#E0F2FE; color:#0369A1; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; margin-top:10px; }
+
+  /* ══ CARD 6 · 误区 ══ */
+  .card-mistakes { background:linear-gradient(155deg,var(--dark) 0%,var(--deep) 100%); padding:36px 30px; min-height:540px; }
+  .mistake-box { background:rgba(232,0,61,.1); border:1px solid rgba(232,0,61,.25); border-radius:16px; padding:16px; margin:12px 0; }
+  .mistake-box h4 { font-size:13px; font-weight:700; color:#FF6B8A; margin-bottom:8px; }
+  .mistake-box p  { font-size:13px; color:rgba(255,255,255,.65); line-height:1.8; }
+  .tips-box { background:rgba(8,145,178,.1); border:1px solid rgba(56,189,248,.3); border-radius:16px; padding:16px; margin:12px 0; }
+  .tips-box h4 { font-size:13px; font-weight:700; color:var(--sky); margin-bottom:8px; }
+  .tip-item { font-size:13px; color:rgba(255,255,255,.65); padding:5px 0; display:flex; gap:10px; line-height:1.7; }
+  .tip-item::before { content:'→'; color:var(--gold); font-weight:700; flex-shrink:0; }
+
+  /* cost comparison table */
+  .cost-table { width:100%; border-collapse:collapse; margin:14px 0; border-radius:10px; overflow:hidden; }
+  .cost-table th { background:var(--cyan); color:#fff; font-size:12px; font-weight:700; padding:9px 12px; text-align:left; }
+  .cost-table td { padding:9px 12px; font-size:12px; border-bottom:1px solid rgba(255,255,255,.07); vertical-align:top; }
+  .cost-table tr:last-child td { border-bottom:none; }
+  .cost-table td.item { color:rgba(255,255,255,.8); font-weight:600; }
+  .cost-table td.train-cost { color:#FF6B8A; font-weight:700; font-family:'Courier New',monospace; }
+  .cost-table td.fine-cost  { color:var(--sky); font-weight:700; font-family:'Courier New',monospace; }
+  .cost-table td.note { color:rgba(255,255,255,.4); font-size:11px; }
+
+  /* ══ CARD 7 · CLOSE ══ */
+  .card-close { background:var(--white); padding:36px 30px; min-height:460px; display:flex; flex-direction:column; gap:18px; }
+  .summary-card { background:linear-gradient(135deg,var(--cyan) 0%,var(--sky) 100%); border-radius:18px; padding:24px; }
+  .summary-card p { font-size:15px; font-weight:700; color:#fff; line-height:1.75; }
+  .interact-card { background:var(--cream); border:1.5px solid #BAE6FD; border-radius:18px; padding:20px; }
+  .interact-card h4 { font-size:13px; font-weight:700; color:var(--cyan); margin-bottom:10px; }
+  .interact-card p  { font-size:13px; color:var(--muted); line-height:1.85; }
+  .interact-card b  { color:var(--ink); }
+  .preview-row { background:var(--dark); border-radius:14px; padding:14px 18px; display:flex; align-items:flex-start; gap:12px; }
+  .blink { width:8px; height:8px; background:var(--ice); border-radius:50%; flex-shrink:0; margin-top:4px; animation:blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+  .preview-text { font-size:13px; color:rgba(255,255,255,.5); line-height:1.7; }
+  .preview-text b { color:#fff; }
+  .close-bar { position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--cyan),var(--sky),var(--ice)); }
+
+  .nav-dots { display:flex; gap:6px; justify-content:center; }
+  .nd { width:6px; height:6px; border-radius:50%; background:#A8C8D8; }
+  .nd.on { background:var(--cyan); width:20px; border-radius:3px; }
+  .page-label { font-size:11px; color:#6090A0; letter-spacing:1px; text-align:center; }
+</style>
+</head>
+<body>
+
+<p class="page-label">📱 小红书图文 · 共7张 · 手机制造厂版 · Day 06</p>
+
+<!-- ══ CARD 1 · COVER ══ -->
+<div class="card card-cover">
+  <div class="cover-series">
+    <span class="cover-pill">30天AI科普营</span>
+    <span class="cover-pill-o">Day 06</span>
+  </div>
+
+  <!-- pipeline decoration -->
+  <div class="cover-pipeline">
+    <div class="pipe-step">
+      <div class="pipe-dot pd-base"></div>
+      <span class="pipe-label">基础大模型</span>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step">
+      <div class="pipe-dot pd-data"></div>
+      <span class="pipe-label">工厂专项数据</span>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step">
+      <div class="pipe-dot pd-train"></div>
+      <span class="pipe-label">微调训练</span>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step">
+      <div class="pipe-dot pd-done"></div>
+      <span class="pipe-label">专属模型 ✓</span>
+    </div>
+  </div>
+
+  <div class="cover-day">DAY 06 · 基础概念</div>
+  <div class="cover-word">训练与<em>微调</em></div>
+  <div class="cover-sub">// TRAINING & FINE-TUNING</div>
+  <div class="cover-tagline">
+    供应商说微调要20万——<br>
+    我问了3个问题，<br>最后5万搞定了。
+  </div>
+  <div class="cover-audience">
+    <span class="aud-tag">👔 管理层</span>
+    <span class="aud-tag">🔧 工程师</span>
+    <span class="aud-tag">📋 品质/IE</span>
+  </div>
+  <div class="cover-bar"></div>
+</div>
+
+<!-- ══ CARD 2 · 管理层视角 ══ -->
+<div class="card card-mgmt">
+  <div class="role-banner mgmt">
+    <div class="role-dot mgmt"></div>
+    <span class="role-label mgmt">管理层视角</span>
+    <span class="role-sub">厂长 / 生产总监 / 采购经理</span>
+  </div>
+
+  <div class="scene-loc">📍 采购会议室 · AI项目报价谈判</div>
+
+  <p class="body-p">上个月，我们在谈一个AI质检系统项目。供应商第一次报价：</p>
+
+  <div class="nego-flow">
+    <div class="nego-row">
+      <div class="nego-tag nt-vendor">供应商</div>
+      <div class="nego-text">给你们做一个<span class="red">专属AI模型，全部重新训练</span>，需要收取20万元的模型训练费用。</div>
+    </div>
+    <div class="nego-divider"></div>
+    <div class="nego-row">
+      <div class="nego-tag nt-mgmt">我方</div>
+      <div class="nego-text">请问，你们用的是从零开始训练，还是<b>在现有大模型基础上微调</b>？</div>
+    </div>
+    <div class="nego-divider"></div>
+    <div class="nego-row">
+      <div class="nego-tag nt-vendor">供应商</div>
+      <div class="nego-text">……是在基础模型上微调的。</div>
+    </div>
+    <div class="nego-divider"></div>
+    <div class="nego-row">
+      <div class="nego-tag nt-mgmt">我方</div>
+      <div class="nego-text">那你们用我们提供的数据量大约多少？<b>训练周期几天？用了几张GPU？</b></div>
+    </div>
+    <div class="nego-divider"></div>
+    <div class="nego-row">
+      <div class="nego-tag nt-vendor">供应商</div>
+      <div class="nego-text">数据约5000条，训练2-3天，用了4张显卡……</div>
+    </div>
+  </div>
+
+  <div class="price-result">
+    <div class="pr-before">
+      <div class="num">20万</div>
+      <div class="label">原始报价</div>
+    </div>
+    <div class="pr-arrow">→</div>
+    <div class="pr-after">
+      <div class="num">5万</div>
+      <div class="label">✅ 最终成交</div>
+    </div>
+    <div class="pr-note">懂得<b>「训练」vs「微调」</b>的区别，就能判断合理成本，不被虚报价格</div>
+  </div>
+</div>
+
+<!-- ══ CARD 3 · 工程师视角 ══ -->
+<div class="card card-eng">
+  <div class="role-banner eng" style="background:rgba(8,145,178,.12);border-color:rgba(56,189,248,.3);">
+    <div class="role-dot eng"></div>
+    <span class="role-label eng">工程师视角</span>
+    <span class="role-sub" style="color:rgba(255,255,255,.3);">算法工程师 / IT工程师</span>
+  </div>
+
+  <div class="scene-loc">📍 IT部门 · 评估AI质检方案技术路线</div>
+
+  <p class="body-p">IT工程师小陈在评估两家供应商的技术方案，发现两家都说做「专属AI」，但成本差了5倍。他拆开方案细看，发现了区别：</p>
+
+  <div class="compare-visual">
+    <div class="cv-row">
+      <div class="cv-header">
+        <div class="cv-title">🏗️ 从零训练（Pre-training）</div>
+        <div class="cv-badge cvb-expensive">成本极高</div>
+      </div>
+      <div class="cv-stats">
+        <div class="cv-stat">
+          <div class="s-num stat-red">数千万条</div>
+          <div class="s-label">所需数据量</div>
+        </div>
+        <div class="cv-stat">
+          <div class="s-num stat-red">数百万</div>
+          <div class="s-label">训练费用（元）</div>
+        </div>
+        <div class="cv-stat">
+          <div class="s-num stat-red">数月</div>
+          <div class="s-label">训练周期</div>
+        </div>
+      </div>
+    </div>
+    <div class="cv-row highlight">
+      <div class="cv-header">
+        <div class="cv-title">⚙️ 微调（Fine-tuning）</div>
+        <div class="cv-badge cvb-smart">性价比之选</div>
+      </div>
+      <div class="cv-stats">
+        <div class="cv-stat">
+          <div class="s-num stat-sky">数百~数千条</div>
+          <div class="s-label">所需数据量</div>
+        </div>
+        <div class="cv-stat">
+          <div class="s-num stat-grn">数千~数万</div>
+          <div class="s-label">训练费用（元）</div>
+        </div>
+        <div class="cv-stat">
+          <div class="s-num stat-grn">数天</div>
+          <div class="s-label">训练周期</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-wrap" style="background:rgba(255,255,255,.05);border-left-color:var(--sky);">
+    <p style="color:rgba(255,255,255,.82);">对我们工厂来说，99%的场景用微调就够了——没有任何必要从零训练一个大模型，那是OpenAI、谷歌干的事。</p>
+    <div class="spk" style="color:rgba(255,255,255,.32);">— 小陈的结论</div>
+  </div>
+</div>
+
+<!-- ══ CARD 4 · EXPLAIN ══ -->
+<div class="card card-explain">
+  <div class="section-head dark">🏭 用员工培训，理解训练与微调</div>
+
+  <p class="body-p">咱们手机厂招新员工的时候，有两种方式：</p>
+
+  <div class="worker-analogy">
+    <div class="wa-row">
+      <div class="wa-icon wi-train">🏫</div>
+      <div class="wa-content">
+        <div class="wa-title">从零培养——类比「从零训练」</div>
+        <div class="wa-desc">招一个完全没工厂经验的新人，从<b>安全规范、工厂文化、基础操作</b>全部从头教起，直到能独立上岗。<br>耗时长、成本高，但培养出来的是<b>「本厂专属人才」</b>。</div>
+        <div class="wa-tags">
+          <div class="wa-tag wt-red">数月培训</div>
+          <div class="wa-tag wt-red">成本极高</div>
+          <div class="wa-tag wt-red">极少必要</div>
+        </div>
+      </div>
+    </div>
+    <div class="wa-row">
+      <div class="wa-icon wi-fine">🎯</div>
+      <div class="wa-content">
+        <div class="wa-title">定向进修——类比「微调」</div>
+        <div class="wa-desc">招一个已有5年工厂经验的老员工，只需要<b>针对性培训本厂工艺和产品</b>，1-2周就能上岗，而且上手快、效果好。</div>
+        <div class="wa-tags">
+          <div class="wa-tag wt-cyan">1-2周上岗</div>
+          <div class="wa-tag wt-cyan">成本合理</div>
+          <div class="wa-tag wt-grn">99%场景适用</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="key-diff-box">
+    <div class="kd-title">📋 核心区别一览</div>
+    <div class="kd-row">
+      <div class="kd-key">起点</div>
+      <div class="kd-val">从零训练：随机初始化 · 微调：<b>已有强大基础能力</b></div>
+    </div>
+    <div class="kd-row">
+      <div class="kd-key">数据量</div>
+      <div class="kd-val">从零训练：数千万条 · 微调：<b>数百~数千条工厂数据即可</b></div>
+    </div>
+    <div class="kd-row">
+      <div class="kd-key">费用</div>
+      <div class="kd-val">从零训练：数百万起 · 微调：<b>数千元到数万元</b></div>
+    </div>
+    <div class="kd-row">
+      <div class="kd-key">周期</div>
+      <div class="kd-val">从零训练：数月 · 微调：<b>数天到2周</b></div>
+    </div>
+    <div class="kd-row">
+      <div class="kd-key">适用</div>
+      <div class="kd-val">从零训练：OpenAI级别 · 微调：<b>工厂专属定制✓</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARD 5 · 实战 ══ -->
+<div class="card card-scenes">
+  <div class="section-head orange">🏭 手机厂3个微调真实场景</div>
+
+  <div class="scene-block s1">
+    <div class="scene-role mgmt">👔 管理层 · 采购谈判</div>
+    <div class="scene-title">💰 和供应商谈AI训练报价时，问这5个问题</div>
+    <div class="scene-body">供应商一说「模型训练费」，立刻问清楚：</div>
+    <div class="decision-grid">
+      <div class="dg-row">
+        <div class="dg-q">是从零训练还是微调现有模型？</div>
+        <div class="dg-a alt">→ 先搞清楚</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">需要我们提供多少条数据？</div>
+        <div class="dg-a alt">→ 数百条够了</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">训练用的GPU是几张？跑多少天？</div>
+        <div class="dg-a alt">→ 成本可估算</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">训练完模型归我方还是供方所有？</div>
+        <div class="dg-a alt">→ 必须谈清楚</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">后续更新模型是否额外收费？</div>
+        <div class="dg-a alt">→ 避免后续坑</div>
+      </div>
+    </div>
+    <span class="tip-tag">💡 问清楚这5点，报价水分一目了然</span>
+  </div>
+
+  <div class="scene-block s2">
+    <div class="scene-role eng">🔧 工程师 · 技术选型</div>
+    <div class="scene-title">⚙️ 什么时候需要微调？什么时候用RAG就够了？</div>
+    <div class="scene-body">不是什么场景都需要微调，先判断：</div>
+    <div class="decision-grid">
+      <div class="dg-row">
+        <div class="dg-q">需要AI学习大量专业术语和工厂知识？</div>
+        <div class="dg-a yes">微调✓</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">只是需要AI查阅和引用工厂文件？</div>
+        <div class="dg-a no">用RAG</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">需要AI固定输出特定格式的报告？</div>
+        <div class="dg-a yes">微调✓</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">工厂数据经常更新，需要实时同步？</div>
+        <div class="dg-a no">用RAG</div>
+      </div>
+    </div>
+    <span class="tip-tag">💡 RAG成本更低，微调效果更稳——先判断再选</span>
+  </div>
+
+  <div class="scene-block s3">
+    <div class="scene-role all">📋 全员 · 准备训练数据</div>
+    <div class="scene-title">📊 微调需要什么样的工厂数据？</div>
+    <div class="scene-body">
+      微调所需的数据其实我们手边就有，常见可用数据：
+    </div>
+    <div class="decision-grid">
+      <div class="dg-row">
+        <div class="dg-q">历史品质报告（问题描述 + 处理结果）</div>
+        <div class="dg-a yes">✓ 可用</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">ECN变更文件（变更原因 + 结论）</div>
+        <div class="dg-a yes">✓ 可用</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">设备异常处理记录（故障 + 解决方案）</div>
+        <div class="dg-a yes">✓ 可用</div>
+      </div>
+      <div class="dg-row">
+        <div class="dg-q">老工程师的经验文档/问答记录</div>
+        <div class="dg-a yes">✓ 极有价值</div>
+      </div>
+    </div>
+    <span class="tip-tag">💡 数据质量比数量更重要，几百条高质量数据胜过几万条垃圾数据</span>
+  </div>
+</div>
+
+<!-- ══ CARD 6 · 误区+成本表 ══ -->
+<div class="card card-mistakes">
+  <div class="section-head gold">❌ 误区 + ✅ 采购指南</div>
+
+  <div class="mistake-box">
+    <h4>❌ 误区：微调就是重新训练一个新模型</h4>
+    <p>很多供应商故意模糊这个概念——微调是在<b style="color:#FF6B8A;">已有大模型基础上</b>做定向优化，不是从头开始。从零训练成本是微调的<b style="color:#FF6B8A;">100倍以上</b>，普通工厂几乎没有理由做。</p>
+  </div>
+
+  <div class="mistake-box">
+    <h4>❌ 误区：微调一次就够了，以后不用管</h4>
+    <p>工厂产品迭代、工艺更新后，微调的模型也需要<b style="color:#FF6B8A;">定期更新</b>。签合同时要确认后续维护的费用和周期，避免一次微调、永久收费。</p>
+  </div>
+
+  <table class="cost-table">
+    <tr><th>方式</th><th>大致费用范围</th><th>适用工厂场景</th></tr>
+    <tr>
+      <td class="item">从零训练</td>
+      <td class="train-cost">数百万~数千万</td>
+      <td class="note">基本不适用，除非造大模型</td>
+    </tr>
+    <tr>
+      <td class="item">全量微调</td>
+      <td class="fine-cost">5万~50万</td>
+      <td class="note">复杂专业场景，数据量大</td>
+    </tr>
+    <tr>
+      <td class="item">LoRA微调</td>
+      <td class="fine-cost">5千~5万</td>
+      <td class="note">✅ 最常见，性价比最高</td>
+    </tr>
+    <tr>
+      <td class="item">Prompt调优</td>
+      <td class="fine-cost">免费~数千</td>
+      <td class="note">简单任务，先试试这个</td>
+    </tr>
+  </table>
+
+  <div class="tips-box">
+    <h4>✅ 采购AI训练服务的3条铁律</h4>
+    <div class="tip-item">让供应商明确说明：是微调还是从零训练，成本立刻变透明</div>
+    <div class="tip-item">要求提供GPU使用记录和训练日志作为交付物，可核查实际工作量</div>
+    <div class="tip-item">训练完的模型权重文件必须交付给我方，不能只给API调用权限</div>
+  </div>
+</div>
+
+<!-- ══ CARD 7 · CLOSE ══ -->
+<div class="card card-close">
+  <div class="section-head cyan">💡 一句话总结</div>
+
+  <div class="summary-card">
+    <p>微调是「给已有大模型喂工厂专属数据」，<br>不是从零造一个新模型。<br><br>
+    对手机厂来说，花数千到数万元微调，<br>比花数百万从零训练<b>聪明100倍。</b></p>
+  </div>
+
+  <div class="interact-card">
+    <h4>💬 今天的互动问题</h4>
+    <p>你们厂有没有被供应商报过<b>「模型训练费」</b>？<br>
+    当时有没有问清楚是从零训练还是微调？<br>
+    有没有觉得价格不合理但不知道怎么反驳？<br><br>
+    评论区说说，我帮你分析值不值 👇</p>
+  </div>
+
+  <div class="preview-row">
+    <div class="blink"></div>
+    <div class="preview-text">
+      明天预告：<b>推理（Inference）</b><br>
+      AI训练完了还要「推理」——推理到底是什么？为什么同一个模型，有时候快有时候慢？
+    </div>
+  </div>
+
+  <div class="close-bar"></div>
+</div>
+
+<div class="nav-dots">
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd"></div>
+  <div class="nd on"></div>
+  <div class="nd"></div>
+</div>
+
+<p class="page-label" style="margin-bottom:24px;">📚 30天AI术语科普营 · 手机制造厂内部科普版 · Day 06</p>
+
+</body>
+</html>
