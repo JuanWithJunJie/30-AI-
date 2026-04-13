@@ -391,8 +391,8 @@
     <span class="role-sub">品质主管 / 制造总监</span>
   </div>
   <div class="scene-loc">📍 制造中心 · SMT品质部门</div>
-  <p class="body-p">品质主管老刘有个每天都在发生的困扰：AOI（自动光学检测）设备报了100个NG，工程师翻出来一看，真正的不良只有8个，剩下92个全是误报。</p>
-  <p class="body-p">这8%的误报率，放到每天生产量级，损失触目惊心：</p>
+  <p class="body-p">品质主管老刘有个每天都在发生的困扰：AOI（自动光学检测）设备报了100个NG，工程师翻出来一看，真正的不良只有8个，剩下92个全是误报——误报占报警的绝大多数。</p>
+  <p class="body-p">放到每天生产量级，损失触目惊心：</p>
 
   <div class="cost-calc">
     <div class="cc-title">💸 每日误报成本估算（单线）</div>
@@ -528,9 +528,9 @@
       <div class="mc-head">AI视觉质检</div>
       <div class="mc-item">从标注图像学习</div>
       <div class="mc-item">自适应光源变化</div>
-      <div class="mc-item">误报率降90%+</div>
+      <div class="mc-item">误报率从8%降至&lt;1%，降幅超90%</div>
       <div class="mc-item">新缺陷补标注即可</div>
-      <div class="mc-item">持续学习越来越准</div>
+      <div class="mc-item">定期迭代优化，积累越多精度越高</div>
     </div>
   </div>
 
@@ -591,14 +591,14 @@
       <div class="ja-icon">🧠</div>
       <div>
         <div class="ja-label">AI质检 = 专业裁判打分</div>
-        <div class="ja-desc">AI看了3万张标注图之后，<b>自己学会了「缺陷长什么样」</b>——即使光线变了、背景变了、同类缺陷形态略有不同，AI也能认出来。新型号上线只需补充标注几百张，不用重写规则。</div>
+        <div class="ja-desc">AI看了3万张标注图之后，<b>自己学会了「缺陷长什么样」</b>——即使光线变了、背景变了、同类缺陷形态略有不同，AI也能认出来。新型号上线需补充标注数百张（覆盖新缺陷类型），不用重写规则。</div>
       </div>
     </div>
     <div class="ja-row">
       <div class="ja-icon">📈</div>
       <div>
         <div class="ja-label">AI学得越多，越准确</div>
-        <div class="ja-desc">每次AI判断后，工程师确认结果会反馈回AI——<b>错判的图进入模型再训练</b>，AI持续进化，6个月后的AI比上线第一天准多了。</div>
+        <div class="ja-desc">每次AI判断后，工程师确认结果会反馈回AI——<b>错判的图片积累一定量后补充标注，定期再训练模型</b>，6个月后的AI比上线第一天精度明显提升。</div>
       </div>
     </div>
   </div>
@@ -611,7 +611,7 @@
         <div class="al-name">人工目检</div>
         <div class="al-desc">受疲劳影响，高强度8小时后漏检率上升到3~5%</div>
       </div>
-      <div class="al-rate">误检~5%</div>
+      <div class="al-rate">漏检~5%</div>
     </div>
     <div class="al-row al-aoi">
       <div class="al-icon">📷</div>
@@ -685,7 +685,7 @@
       <br>• 同时检测2D外观 + 3D高度信息
       <br>• AI识别桥接/虚焊/锡量不足，置信度附带
       <br>• 漏检的不良焊点实时关联<b>锡膏印刷批次+回流焊曲线</b>，根因追溯自动完成<br><br>
-      漏检率从0.3%降到<b>0.03%</b>，主板质量客诉减少40%。
+      漏检率从0.3%降到<b>0.03%</b>，<b>主板焊点缺陷流出大幅减少，有效保护了下游良品率</b>。
     </div>
     <span class="result-tag rt-ok">⚡ 漏检率-90% · 客诉-40%</span>
   </div>
@@ -697,10 +697,10 @@
       手机屏幕亮点/暗点等缺陷人工检测强度高、疲劳误判多，传统方式靠人盯着屏幕判断，每人每天最多检1200片，8小时后漏检率显著上升。<br><br>
       <b>AI质检方案：</b>点亮屏幕后工业相机拍摄全屏，AI分析每一个像素的亮度偏差：
       <br>• 识别亮点、暗点、横线、竖线、Mura不均匀等6类缺陷
-      <br>• 每片屏幕检测时间&lt;0.5秒，<b>速度是人工的8倍</b>
+      <br>• 每片屏幕检测时间&lt;0.5秒，<b>速度是人工的40倍</b>
       <br>• 缺陷坐标精确到像素级，分级输出（轻/中/重）
     </div>
-    <span class="result-tag rt-amber">⚡ 检测速度×8 · 不受疲劳影响</span>
+    <span class="result-tag rt-amber">⚡ 检测速度×40 · 不受疲劳影响</span>
   </div>
 </div>
 
@@ -769,7 +769,7 @@
     <p><em>AI质检</em> = 用深度学习替代规则判断——<br>
     从标注图像中学「什么是缺陷」，<br>
     而不是靠工程师手写阈值规则。<br><br>
-    <b>核心价值：误报率降90%，解放工程师；<br>漏检率降90%，保护产品品质。</b></p>
+    <b>核心价值：误报率从8%降至0.8%，降幅90%，解放工程师；<br>漏检率降90%，保护产品品质。</b></p>
   </div>
 
   <div class="interact-card">
