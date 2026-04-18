@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI术语科普营 · 完整实现过程</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+
+  :root {
+    --bg:       #08080F;
+    --surface:  #10101C;
+    --border:   rgba(255,255,255,.08);
+    --phase1:   #00C4FF;  /* 策划 - 冰蓝 */
+    --phase2:   #8B5CF6;  /* 内容设计 - 紫 */
+    --phase3:   #F59E0B;  /* 技术工具 - 琥珀 */
+    --phase4:   #10B981;  /* 生产流程 - 翠绿 */
+    --phase5:   #EF4444;  /* 质量控制 - 红 */
+    --phase6:   #FF6B35;  /* 输出成果 - 橙 */
+    --text:     #F0F0F8;
+    --muted:    #8888AA;
+    --white:    #FFFFFF;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Noto Sans SC', 'PingFang SC', sans-serif;
+    color: var(--text);
+    min-width: 1200px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0D0D1E 0%, #150A2E 50%, #0D0D1E 100%);
+    border-bottom: 1px solid rgba(139,92,246,.3);
+    padding: 52px 80px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 10% 50%, rgba(0,196,255,.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 30%, rgba(139,92,246,.14) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(255,107,53,.07) 0%, transparent 40%);
+  }
+  .header-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
+  .header-left {}
+  .header-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.4);
+    color: #C4B5FD; font-size: 12px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px; letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .header-title {
+    font-size: 42px; font-weight: 900; line-height: 1.1;
+    background: linear-gradient(135deg, #FFFFFF 0%, #C4B5FD 50%, #00C4FF 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-sub { font-size: 16px; color: var(--muted); margin-top: 10px; line-height: 1.7; }
+  .header-sub em { font-style: normal; color: #C4B5FD; }
+  .header-stats {
+    display: flex; gap: 24px;
+  }
+  .stat-box {
+    background: rgba(255,255,255,.05); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 24px; text-align: center;
+    min-width: 100px;
+  }
+  .stat-num {
+    font-size: 36px; font-weight: 900;
+    background: linear-gradient(135deg, #00C4FF, #8B5CF6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── MAIN CONTENT ── */
+  .main { padding: 60px 80px; }
+
+  /* ── SECTION TITLE ── */
+  .section-label {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 32px;
+  }
+  .section-label-line {
+    flex: 1; height: 1px; background: var(--border);
+  }
+  .section-label-text {
+    font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    color: var(--muted);
+  }
+
+  /* ── PHASE FLOW ── */
+  .phase-flow {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .phase-flow::before {
+    content: '';
+    position: absolute;
+    top: 40px; left: 40px; right: 40px; height: 2px;
+    background: linear-gradient(90deg,
+      var(--phase1) 0%, var(--phase1) 16.6%,
+      var(--phase2) 16.6%, var(--phase2) 33.3%,
+      var(--phase3) 33.3%, var(--phase3) 50%,
+      var(--phase4) 50%, var(--phase4) 66.6%,
+      var(--phase5) 66.6%, var(--phase5) 83.3%,
+      var(--phase6) 83.3%, var(--phase6) 100%);
+    opacity: 0.4;
+    z-index: 0;
+  }
+  .phase-item {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 12px;
+    position: relative; z-index: 1;
+  }
+  .phase-circle {
+    width: 80px; height: 80px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 28px;
+    border: 2px solid;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .phase-num {
+    position: absolute; top: -4px; right: -4px;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 10px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg);
+  }
+  .phase-name { font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+  .phase-desc { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+  /* ── TWO COLUMN LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 40px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .card.c1::before { background: linear-gradient(90deg, var(--phase1), transparent); }
+  .card.c2::before { background: linear-gradient(90deg, var(--phase2), transparent); }
+  .card.c3::before { background: linear-gradient(90deg, var(--phase3), transparent); }
+  .card.c4::before { background: linear-gradient(90deg, var(--phase4), transparent); }
+  .card.c5::before { background: linear-gradient(90deg, var(--phase5), transparent); }
+  .card.c6::before { background: linear-gradient(90deg, var(--phase6), transparent); }
+
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .card-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .card-title { font-size: 16px; font-weight: 700; }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── TAG ── */
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+    margin: 3px 3px 3px 0;
+  }
+
+  /* ── LIST ── */
+  .list { display: flex; flex-direction: column; gap: 10px; }
+  .list-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 13px; line-height: 1.65; color: rgba(255,255,255,.75);
+  }
+  .list-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .list-item b { color: var(--white); font-weight: 700; }
+
+  /* ── AUDIENCE GRID ── */
+  .audience-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .aud-box {
+    border-radius: 14px; padding: 16px;
+    text-align: center;
+  }
+  .aud-emoji { font-size: 28px; margin-bottom: 8px; }
+  .aud-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .aud-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+  /* ── CARD STRUCTURE ── */
+  .card-struct {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .cs-row {
+    display: flex; align-items: center; gap: 10px;
+    border-radius: 10px; padding: 9px 14px;
+  }
+  .cs-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 10px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--bg);
+  }
+  .cs-name { font-size: 13px; font-weight: 700; flex: 1; }
+  .cs-desc { font-size: 11px; color: var(--muted); }
+
+  /* ── TOOL GRID ── */
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tool-item {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.04); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .tool-icon { font-size: 22px; flex-shrink: 0; }
+  .tool-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .tool-desc { font-size: 11px; color: var(--muted); }
+
+  /* ── FLOW STEPS ── */
+  .flow-steps {
+    display: flex; align-items: center; gap: 0;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25);
+    border-radius: 10px; padding: 8px 14px;
+    font-size: 12.5px; font-weight: 700; color: #34D399;
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    color: rgba(255,255,255,.18); font-size: 18px;
+    padding: 0 4px; flex-shrink: 0;
+  }
+
+  /* ── DESIGN SYSTEM ── */
+  .color-weeks {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  .week-block { border-radius: 14px; padding: 16px; }
+  .week-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; opacity: .7; }
+  .week-name { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .week-days { display: flex; flex-wrap: wrap; gap: 4px; }
+  .day-chip {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 6px;
+    opacity: .85;
+  }
+
+  /* ── QC MATRIX ── */
+  .qc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .qc-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    border-radius: 12px; padding: 14px;
+    background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.18);
+  }
+  .qc-icon { font-size: 20px; flex-shrink: 0; }
+  .qc-title { font-size: 13px; font-weight: 700; color: #FCA5A5; margin-bottom: 3px; }
+  .qc-desc { font-size: 11.5px; color: rgba(255,255,255,.5); line-height: 1.5; }
+
+  /* ── OUTPUT ── */
+  .output-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .output-box {
+    background: rgba(255,107,53,.08); border: 1px solid rgba(255,107,53,.2);
+    border-radius: 16px; padding: 20px; text-align: center;
+  }
+  .output-num {
+    font-size: 40px; font-weight: 900;
+    background: linear-gradient(135deg, #FF6B35, #FFB800);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .output-unit { font-size: 16px; font-weight: 700; color: #FF6B35; }
+  .output-desc { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+  /* ── TIMELINE ── */
+  .timeline-row {
+    display: flex; align-items: stretch; gap: 0;
+    margin-bottom: 0;
+    border-radius: 16px; overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .tl-phase-label {
+    width: 140px; flex-shrink: 0;
+    padding: 16px 20px;
+    display: flex; flex-direction: column; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .tl-phase-sub { font-size: 11px; margin-top: 3px; opacity: .6; }
+  .tl-content {
+    flex: 1; background: rgba(255,255,255,.04);
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: linear-gradient(135deg, #0D0D1E, #150A2E);
+    border-top: 1px solid rgba(139,92,246,.2);
+    padding: 40px 80px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-left { font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .footer-left b { color: var(--text); }
+  .footer-badge {
+    background: rgba(139,92,246,.15); border: 1px solid rgba(139,92,246,.3);
+    border-radius: 12px; padding: 12px 20px;
+    font-size: 13px; color: #C4B5FD; font-weight: 700;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-tag">📋 内部项目复盘 · AI赋能制造</div>
+      <div class="header-title">30天AI术语科普营<br>完整实现过程</div>
+      <div class="header-sub">
+        面向制造中心全员的AI科普内容生产项目 · <em>小红书图文格式 · 7张卡片/天</em><br>
+        从策划到产出：如何用 Claude AI × 代码工具 实现每日高质量内容自动化生产
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-box">
+        <div class="stat-num">30</div>
+        <div class="stat-label">天 / 期</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">210</div>
+        <div class="stat-label">张卡片PNG</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">30</div>
+        <div class="stat-label">个HTML文件</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">3</div>
+        <div class="stat-label">类受众群体</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- PHASE OVERVIEW -->
+  <div class="section-label">
+    <div class="section-label-line"></div>
+    <div class="section-label-text">PHASE OVERVIEW · 六大阶段</div>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="phase-flow" style="margin-bottom:48px;">
+    <div class="phase-item">
+      <div class="phase-circle" style="background:rgba(0,196,255,.1);border-color:rgba(0,196,255,.5);">
+        🎯
+        <div class="phase-num" style="background:var(--phase1);">1</div>
+      </div>
+      <div class="phase-name" style="color:var(--phase1);">项目策划</div>
+      <div class="phase-desc">受众分析<br>选题规划<br>结构标准</div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-circle" style="background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.5);">
+        📐
+        <div class="phase-num" style="background:var(--phase2);">2</div>
+      </div>
+      <div class="phase-name" style="color:var(--phase2);">内容设计</div>
+      <div class="phase-desc">七段结构<br>三视角叙事<br>标题策略</div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-circle" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.5);">
+        🛠️
+        <div class="phase-num" style="background:var(--phase3);">3</div>
+      </div>
+      <div class="phase-name" style="color:var(--phase3);">技术工具</div>
+      <div class="phase-desc">Claude AI<br>Playwright<br>HTML/CSS</div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-circle" style="background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.5);">
+        ⚙️
+        <div class="phase-num" style="background:var(--phase4);">4</div>
+      </div>
+      <div class="phase-name" style="color:var(--phase4);">生产流程</div>
+      <div class="phase-desc">单日标准流程<br>Logo注入<br>自动截图</div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-circle" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.5);">
+        ✅
+        <div class="phase-num" style="background:var(--phase5);">5</div>
+      </div>
+      <div class="phase-name" style="color:var(--phase5);">质量控制</div>
+      <div class="phase-desc">事实核查<br>数据准确性<br>品牌合规</div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-circle" style="background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.5);">
+        📦
+        <div class="phase-num" style="background:var(--phase6);">6</div>
+      </div>
+      <div class="phase-name" style="color:var(--phase6);">输出交付</div>
+      <div class="phase-desc">PNG截图<br>HTML源文件<br>30天完整包</div>
+    </div>
+  </div>
+
+  <!-- PHASE 1+2: 策划 & 内容设计 -->
+  <div class="section-label">
+    <div class="section-label-line"></div>
+    <div class="section-label-text">PHASE 1-2 · 策划与内容设计</div>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:32px;">
+
+    <!-- 受众分析 -->
+    <div class="card c1">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(0,196,255,.15);">👥</div>
+        <div>
+          <div class="card-title">受众分层分析</div>
+          <div class="card-sub">一份内容，三种人群，三种需求</div>
+        </div>
+      </div>
+      <div class="audience-grid">
+        <div class="aud-box" style="background:rgba(0,196,255,.1);border:1px solid rgba(0,196,255,.2);">
+          <div class="aud-emoji">👔</div>
+          <div class="aud-name" style="color:var(--phase1);">管理层</div>
+          <div class="aud-desc">决策视角<br>ROI · 风险 · 趋势<br>不需要技术细节</div>
+        </div>
+        <div class="aud-box" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);">
+          <div class="aud-emoji">🔧</div>
+          <div class="aud-name" style="color:var(--phase2);">工程师</div>
+          <div class="aud-desc">技术视角<br>原理 · 架构 · 实现<br>代码与数据</div>
+        </div>
+        <div class="aud-box" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);">
+          <div class="aud-emoji">📋</div>
+          <div class="aud-name" style="color:var(--phase4);">品质/IE</div>
+          <div class="aud-desc">应用视角<br>流程 · 场景 · 操作<br>能用就行</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 选题规划 -->
+    <div class="card c1">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(0,196,255,.15);">📅</div>
+        <div>
+          <div class="card-title">30天选题规划</div>
+          <div class="card-sub">四周递进，从基础到前沿</div>
+        </div>
+      </div>
+      <div class="color-weeks">
+        <div class="week-block" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);">
+          <div class="week-label" style="color:#60A5FA;">第一周</div>
+          <div class="week-name" style="color:#93C5FD;">AI基础概念</div>
+          <div class="week-days">
+            <span class="day-chip" style="background:rgba(59,130,246,.2);color:#93C5FD;">Token</span>
+            <span class="day-chip" style="background:rgba(59,130,246,.2);color:#93C5FD;">Prompt</span>
+            <span class="day-chip" style="background:rgba(59,130,246,.2);color:#93C5FD;">大模型</span>
+            <span class="day-chip" style="background:rgba(59,130,246,.2);color:#93C5FD;">上下文</span>
+            <span class="day-chip" style="background:rgba(59,130,246,.2);color:#93C5FD;">多模态</span>
+            <span class="day-chip" style="background:rgba(59,130,246,.2);color:#93C5FD;">微调</span>
+            <span class="day-chip" style="background:rgba(59,130,246,.2);color:#93C5FD;">推理</span>
+          </div>
+        </div>
+        <div class="week-block" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);">
+          <div class="week-label" style="color:#34D399;">第二周</div>
+          <div class="week-name" style="color:#6EE7B7;">AI核心技术</div>
+          <div class="week-days">
+            <span class="day-chip" style="background:rgba(16,185,129,.2);color:#6EE7B7;">MCP</span>
+            <span class="day-chip" style="background:rgba(16,185,129,.2);color:#6EE7B7;">Agent</span>
+            <span class="day-chip" style="background:rgba(16,185,129,.2);color:#6EE7B7;">工具调用</span>
+            <span class="day-chip" style="background:rgba(16,185,129,.2);color:#6EE7B7;">LLM</span>
+            <span class="day-chip" style="background:rgba(16,185,129,.2);color:#6EE7B7;">Embedding</span>
+            <span class="day-chip" style="background:rgba(16,185,129,.2);color:#6EE7B7;">RAG</span>
+            <span class="day-chip" style="background:rgba(16,185,129,.2);color:#6EE7B7;">向量库</span>
+          </div>
+        </div>
+        <div class="week-block" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);">
+          <div class="week-label" style="color:#A78BFA;">第三周</div>
+          <div class="week-name" style="color:#C4B5FD;">AI类型与应用</div>
+          <div class="week-days">
+            <span class="day-chip" style="background:rgba(139,92,246,.2);color:#C4B5FD;">AIGC</span>
+            <span class="day-chip" style="background:rgba(139,92,246,.2);color:#C4B5FD;">生成式AI</span>
+            <span class="day-chip" style="background:rgba(139,92,246,.2);color:#C4B5FD;">判别式AI</span>
+            <span class="day-chip" style="background:rgba(139,92,246,.2);color:#C4B5FD;">CV</span>
+            <span class="day-chip" style="background:rgba(139,92,246,.2);color:#C4B5FD;">NLP</span>
+            <span class="day-chip" style="background:rgba(139,92,246,.2);color:#C4B5FD;">多智能体</span>
+            <span class="day-chip" style="background:rgba(139,92,246,.2);color:#C4B5FD;">FT vs RAG</span>
+          </div>
+        </div>
+        <div class="week-block" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);">
+          <div class="week-label" style="color:#FCD34D;">第四周</div>
+          <div class="week-name" style="color:#FDE68A;">AI+制造落地</div>
+          <div class="week-days">
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">AI原生</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">端侧AI</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">云侧AI</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">智能制造</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">预测维护</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">AI质检</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">参数规模</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">幻觉</span>
+            <span class="day-chip" style="background:rgba(245,158,11,.2);color:#FDE68A;">AGI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 七段结构 -->
+  <div class="card c2" style="margin-bottom:32px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(139,92,246,.15);">📐</div>
+      <div>
+        <div class="card-title">单期固定七段式内容结构</div>
+        <div class="card-sub">每期7张卡片，结构固定，受众分层，每张聚焦一个视角</div>
+      </div>
+    </div>
+    <div class="card-struct">
+      <div class="cs-row" style="background:rgba(255,255,255,.05);">
+        <div class="cs-num" style="background:#FF6B35;">1</div>
+        <div class="cs-name">封面卡 · Cover</div>
+        <div class="cs-desc">爆款标题 + 本期术语 + SVG定制封面插图 + 受众标签</div>
+      </div>
+      <div class="cs-row" style="background:rgba(0,196,255,.06);">
+        <div class="cs-num" style="background:var(--phase1);">2</div>
+        <div class="cs-name">管理层故事 · 决策视角</div>
+        <div class="cs-desc">主管/总监视角，真实场景，ROI数据，业务价值</div>
+      </div>
+      <div class="cs-row" style="background:rgba(139,92,246,.06);">
+        <div class="cs-num" style="background:var(--phase2);">3</div>
+        <div class="cs-name">工程师故事 · 技术视角</div>
+        <div class="cs-desc">深夜深色卡，技术原理、代码架构、性能数据</div>
+      </div>
+      <div class="cs-row" style="background:rgba(16,185,129,.06);">
+        <div class="cs-num" style="background:var(--phase4);">4</div>
+        <div class="cs-name">概念解释 · 类比通俗化</div>
+        <div class="cs-desc">用「医生/厨师/图书馆」等日常类比让技术概念人人可懂</div>
+      </div>
+      <div class="cs-row" style="background:rgba(245,158,11,.06);">
+        <div class="cs-num" style="background:var(--phase3);">5</div>
+        <div class="cs-name">实战场景 · 制造业落地</div>
+        <div class="cs-desc">3个具体场景，匿名化公司举例，量化结果数据</div>
+      </div>
+      <div class="cs-row" style="background:rgba(239,68,68,.06);">
+        <div class="cs-num" style="background:var(--phase5);">6</div>
+        <div class="cs-name">误区与技巧 · 避坑指南</div>
+        <div class="cs-desc">❌常见误解 + ✅正确认知 + 快速选型/防坑清单</div>
+      </div>
+      <div class="cs-row" style="background:rgba(255,107,53,.06);">
+        <div class="cs-num" style="background:var(--phase6);">7</div>
+        <div class="cs-name">总结互动 · 留言引导</div>
+        <div class="cs-desc">一句话总结 + 互动问题 + 下期预告</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3: 技术工具 -->
+  <div class="section-label">
+    <div class="section-label-line"></div>
+    <div class="section-label-text">PHASE 3 · 技术工具栈</div>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="card c3" style="margin-bottom:32px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(245,158,11,.15);">🛠️</div>
+      <div>
+        <div class="card-title">核心技术工具组合</div>
+        <div class="card-sub">Claude AI + 代码工具 = 每日高质量内容自动化生产</div>
+      </div>
+    </div>
+    <div class="tool-grid">
+      <div class="tool-item">
+        <div class="tool-icon">🤖</div>
+        <div>
+          <div class="tool-name">Claude AI（Sonnet 4.6）</div>
+          <div class="tool-desc">内容策划 · HTML/CSS编写 · 设计美学决策 · 事实核查</div>
+        </div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon">🎭</div>
+        <div>
+          <div class="tool-name">Playwright（Python）</div>
+          <div class="tool-desc">无头浏览器自动截图 · device_scale_factor=3高清 · 逐卡精准截取</div>
+        </div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon">🎨</div>
+        <div>
+          <div class="tool-name">HTML5 + CSS3 + SVG</div>
+          <div class="tool-desc">卡片渲染 · 定制封面插图 · CSS变量设计系统 · Google Fonts字体</div>
+        </div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon">🖼️</div>
+        <div>
+          <div class="tool-name">Logo Base64处理</div>
+          <div class="tool-desc">白/黑双版Logo内嵌 · 深色卡用白Logo · 浅色卡用黑Logo · top:8px right:14px</div>
+        </div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon">💻</div>
+        <div>
+          <div class="tool-name">frontend-design Skill</div>
+          <div class="tool-desc">自定义设计指导规则 · 每次生成前读取 · 确保视觉质量一致性</div>
+        </div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon">📁</div>
+        <div>
+          <div class="tool-name">文件系统管理</div>
+          <div class="tool-desc">统一输出至/outputs · 模板→注入→截图→存档 · 命名规范</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4: 生产流程 -->
+  <div class="section-label">
+    <div class="section-label-line"></div>
+    <div class="section-label-text">PHASE 4 · 单日标准生产流程</div>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="card c4" style="margin-bottom:16px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(16,185,129,.15);">⚙️</div>
+      <div>
+        <div class="card-title">每日生产 SOP（标准作业流程）</div>
+        <div class="card-sub">每期用相同的标准化流程，确保质量稳定</div>
+      </div>
+    </div>
+    <div class="flow-steps" style="gap:4px;flex-wrap:wrap;">
+      <div class="flow-step" style="background:rgba(0,196,255,.1);border-color:rgba(0,196,255,.25);color:#67E8F9;">① 读取 Skill</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">② 美学设计决策</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">③ 编写HTML/CSS</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);color:#FCD34D;">④ Logo注入（白/黑）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);color:#C4B5FD;">⑤ Playwright截图</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:#FCA5A5;">⑥ 质量核查</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.25);color:#FDBA74;">⑦ 输出/存档</div>
+    </div>
+
+    <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+      <div style="background:rgba(0,196,255,.08);border:1px solid rgba(0,196,255,.2);border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:700;color:#67E8F9;margin-bottom:8px;">① 读取设计Skill规则</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.6;">每次生成前必读<br>/mnt/skills/user/frontend-design/<br>SKILL.md 设计规范文件</div>
+      </div>
+      <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:700;color:#34D399;margin-bottom:8px;">⑤ Playwright截图规范</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.6;">viewport: 860×900px<br>device_scale_factor: 3（高清）<br>wait 3000ms 等待字体加载<br>CSS selector 逐卡截图</div>
+      </div>
+      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:700;color:#FCD34D;margin-bottom:8px;">④ Logo注入规范</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.6;">height: 34px<br>top: 8px / right: 14px<br>深色卡 → 白色Logo<br>浅色卡 → 黑色Logo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设计系统 -->
+  <div class="card c4" style="margin-bottom:32px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(16,185,129,.15);">🎨</div>
+      <div>
+        <div class="card-title">视觉设计系统</div>
+        <div class="card-sub">30天30种配色，每天独特，永不重复</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:12px;">每天美学方向举例</div>
+        <div class="list">
+          <div class="list-item"><div class="list-dot" style="background:#FF4500;"></div><b>Day 01 Token</b> — 深红/扫描电子线圈感</div>
+          <div class="list-item"><div class="list-dot" style="background:#0A1E3D;"></div><b>Day 08 MCP</b> — 铜金/深金铜黄工程感</div>
+          <div class="list-item"><div class="list-dot" style="background:#00FF88;"></div><b>Day 23 端侧AI</b> — 石墨黑/磷光绿芯片感</div>
+          <div class="list-item"><div class="list-dot" style="background:#FF4500;"></div><b>Day 26 预测维护</b> — 心电图橙/脉冲绿生命体征</div>
+          <div class="list-item"><div class="list-dot" style="background:#7B2FFF;"></div><b>Day 28 参数规模</b> — 宇宙紫/星云金行星系</div>
+          <div class="list-item"><div class="list-dot" style="background:#FF006E;"></div><b>Day 29 幻觉</b> — 幽灵绿/警示品红赛博感</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:12px;">封面SVG定制插图</div>
+        <div class="list">
+          <div class="list-item"><div class="list-dot" style="background:var(--phase1);"></div>每张封面有<b>独特SVG主题插图</b>，手绘感强</div>
+          <div class="list-item"><div class="list-dot" style="background:var(--phase2);"></div>Day 23：<b>芯片引脚图</b>（NPU结构）</div>
+          <div class="list-item"><div class="list-dot" style="background:var(--phase3);"></div>Day 24：<b>服务器机柜图</b>（GPU集群）</div>
+          <div class="list-item"><div class="list-dot" style="background:var(--phase4);"></div>Day 25：<b>三层架构蓝图</b>（AI+MOM）</div>
+          <div class="list-item"><div class="list-dot" style="background:var(--phase5);"></div>Day 26：<b>振动波形图</b>（正常→异常→预警）</div>
+          <div class="list-item"><div class="list-dot" style="background:var(--phase6);"></div>Day 30：<b>ANI→AGI→ASI行星进化图</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5: 质量控制 -->
+  <div class="section-label">
+    <div class="section-label-line"></div>
+    <div class="section-label-text">PHASE 5 · 质量控制标准</div>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="card c5" style="margin-bottom:32px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(239,68,68,.15);">✅</div>
+      <div>
+        <div class="card-title">三维质量把控体系</div>
+        <div class="card-sub">事实准确 · 品牌合规 · 视觉一致</div>
+      </div>
+    </div>
+    <div class="qc-grid">
+      <div class="qc-item">
+        <div class="qc-icon">🔬</div>
+        <div>
+          <div class="qc-title">AI模型事实核查</div>
+          <div class="qc-desc">闭源模型（Claude/GPT）参数量官方未披露的，不得编造固定数值，标注「官方未披露」。开源模型（Llama/Phi-4）以官方数据为准，标注✓</div>
+        </div>
+      </div>
+      <div class="qc-item">
+        <div class="qc-icon">🏢</div>
+        <div>
+          <div class="qc-title">公司案例匿名化</div>
+          <div class="qc-desc">所有实战案例描述为「某头部手机制造企业」，不直接点名特定公司，避免被误解为已证实案例，保持内容的通用参考价值</div>
+        </div>
+      </div>
+      <div class="qc-item">
+        <div class="qc-icon">📐</div>
+        <div>
+          <div class="qc-title">视觉规范一致性</div>
+          <div class="qc-desc">Logo位置固定（top:8px right:14px）、字体统一（Noto Sans SC）、截图参数固定（860×900 3x）、wait_for_timeout(3000)确保字体加载</div>
+        </div>
+      </div>
+      <div class="qc-item">
+        <div class="qc-icon">📋</div>
+        <div>
+          <div class="qc-title">内容准确性审查</div>
+          <div class="qc-desc">技术概念表述经过核查：GPT-5.4官方确认1M上下文、内置computer use；Phi-4官方14B参数；Claude Opus 4.6参数量标注未披露</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 6: 输出 -->
+  <div class="section-label">
+    <div class="section-label-line"></div>
+    <div class="section-label-text">PHASE 6 · 最终交付成果</div>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="card c6" style="margin-bottom:32px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(255,107,53,.15);">📦</div>
+      <div>
+        <div class="card-title">交付物汇总</div>
+        <div class="card-sub">可直接发布的高清PNG + 可二次编辑的HTML源文件</div>
+      </div>
+    </div>
+    <div class="output-grid">
+      <div class="output-box">
+        <div class="output-num">210</div>
+        <div class="output-unit">张</div>
+        <div class="output-desc">高清PNG卡片<br>2580×2700px（3x）<br>可直接发布小红书</div>
+      </div>
+      <div class="output-box">
+        <div class="output-num">30</div>
+        <div class="output-unit">个</div>
+        <div class="output-desc">HTML源文件<br>含Logo · 可浏览器查看<br>可二次修改重新截图</div>
+      </div>
+      <div class="output-box">
+        <div class="output-num">30</div>
+        <div class="output-unit">套</div>
+        <div class="output-desc">独立视觉系统<br>每天不同配色美学<br>30种SVG封面插图</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY LEARNINGS -->
+  <div class="section-label">
+    <div class="section-label-line"></div>
+    <div class="section-label-text">KEY LEARNINGS · 关键经验总结</div>
+    <div class="section-label-line"></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card" style="border-color:rgba(139,92,246,.3);">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(139,92,246,.15);">💡</div>
+        <div>
+          <div class="card-title">可复用的成功经验</div>
+          <div class="card-sub">下次做类似项目可直接参考</div>
+        </div>
+      </div>
+      <div class="list">
+        <div class="list-item"><div class="list-dot" style="background:#A78BFA;"></div><b>结构化模板驱动</b>：固定七段式结构让每期生产「有章可循」，大幅降低内容决策成本</div>
+        <div class="list-item"><div class="list-dot" style="background:#A78BFA;"></div><b>三视角分层叙事</b>：同一概念对不同人说不同的话，一份内容覆盖全员，不流失任何读者</div>
+        <div class="list-item"><div class="list-dot" style="background:#A78BFA;"></div><b>代码渲染→截图输出</b>：HTML渲染比PPT/美图等工具灵活100倍，修改成本极低</div>
+        <div class="list-item"><div class="list-dot" style="background:#A78BFA;"></div><b>类比优先策略</b>：「厨师/瑞士军刀/图书馆」等日常类比，让技术概念人人可懂</div>
+        <div class="list-item"><div class="list-dot" style="background:#A78BFA;"></div><b>每天视觉区分</b>：30天30套配色，避免视觉疲劳，读者能直观区分每期内容</div>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(239,68,68,.3);">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(239,68,68,.15);">⚠️</div>
+        <div>
+          <div class="card-title">需要注意的坑</div>
+          <div class="card-sub">避免踩同样的坑</div>
+        </div>
+      </div>
+      <div class="list">
+        <div class="list-item"><div class="list-dot" style="background:#F87171;"></div><b>等字体加载</b>：Playwright截图必须 wait_for_timeout(3000) 否则中文字体回退乱码</div>
+        <div class="list-item"><div class="list-dot" style="background:#F87171;"></div><b>闭源模型参数不可编造</b>：Claude/GPT参数量官方未披露，不得写具体数字，否则传播错误信息</div>
+        <div class="list-item"><div class="list-dot" style="background:#F87171;"></div><b>公司名需匿名</b>：案例描述用「某头部制造企业」，不直接点名，避免误读为已证实案例</div>
+        <div class="list-item"><div class="list-dot" style="background:#F87171;"></div><b>Logo路径要检查</b>：每次新会话后需确认Logo b64文件是否存在，否则注入失败</div>
+        <div class="list-item"><div class="list-dot" style="background:#F87171;"></div><b>技术细节需核查</b>：工艺参数（温度/标准）一定要核查，不能凭AI直接给的数字写进内容</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ══ FOOTER ══ -->
+<div class="footer">
+  <div class="footer-left">
+    <b>制造中心 AI赋能小组</b><br>
+    30天AI术语科普营 · 完整实现过程复盘<br>
+    工具：Claude AI · Playwright · HTML/CSS · Python<br>
+    周期：30天 · 产出：210张卡片 + 30个HTML文件
+  </div>
+  <div class="footer-badge">
+    🏆 项目完结<br>
+    <span style="font-size:11px;font-weight:400;opacity:.7;">可作为AI+内容生产的标准化参考方案</span>
+  </div>
+</div>
+
+</body>
+</html>
