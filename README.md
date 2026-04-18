@@ -30,6 +30,10 @@
 - HTML5 + CSS3（卡片式学习界面）
 - 响应式设计，支持移动端浏览
 
+## 下载
+
+完整课程包（包含30个HTML文件）可在 [Release v1.0.0](https://github.com/JuanWithJunJie/30-AI-/releases/tag/v1.0.0) 页面下载。
+
 ## 维护说明
 
 本仓库由制造中心维护，学习内容持续更新。如有问题请联系相关负责人。
