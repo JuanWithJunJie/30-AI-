@@ -32,7 +32,7 @@
 
 ## 下载
 
-完整课程包（包含30个HTML文件）可在 [Release v1.0.0](https://github.com/JuanWithJunJie/30-AI-/releases/tag/v1.0.0) 页面下载。
+完整课程包（包含30个HTML文件）可在 [Release v1.0.0](https://github.com/JuanWithJunJie/30-AI-/releases/tag/v1.0.1) 页面下载。
 
 ## 维护说明
 
